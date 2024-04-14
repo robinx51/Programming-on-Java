@@ -61,13 +61,13 @@ public class Lab6 extends javax.swing.JFrame {
     {
         String[] arr = msg.split(" ");
         Double[] results = new Double[arr.length];
-        LinkedList<Integer> tempList = sendedRows_map.get(ClientId);
+        LinkedList<Integer> ListOfRows = sendedRows_map.get(ClientId);
         for (int row = 0; row < arr.length; row++)
         {
             results[row] = Double.valueOf(arr[row]);
             
             TableModel model = BoundTable.getModel();
-            model.setValueAt(results[row], tempList.get(row), 3);
+            model.setValueAt(results[row], ListOfRows.get(row), 3);
         }
     }
     
@@ -96,51 +96,56 @@ public class Lab6 extends javax.swing.JFrame {
         }
         else
         {
-            int rowsCountForEachClient = records_map.size() / server.ClientCounter;
-            double rowsCountRemainder  = records_map.size() % server.ClientCounter;
-            
-            int clientCountForMessages = server.ClientCounter < records_map.size()? server.ClientCounter : records_map.size();
-            
-            LinkedList<Integer> listOfKeysOfRows = new LinkedList();
-            for (Map.Entry<Integer, LinkedList<String>> entry : records_map.entrySet()) {
-                listOfKeysOfRows.add(entry.getKey());
-            }
-            
-            // Получение списка id клиентов
-            int[] id = new int[server.list.size()];
-            {
-                int ct = 0;
-                for (Map.Entry<Integer, ClientObject> entry : server.list.entrySet()) 
-                    id[ct++] = entry.getKey();
-            }
-            sendedRows_map = new TreeMap<>();
-            String[] message = new String[clientCountForMessages];
-            // Автоматическое распределение и заполнение массива отправляемых строк
-            { 
-                int counter = 0;
-                for (int clientNum = 0; clientNum < rowsCountForEachClient; clientNum++) {
-                    message[clientNum] = "$";
-                    LinkedList<Integer> tempList = new LinkedList<>();
-                    for (int i = 0; i < clientCountForMessages; i++)
-                    {
-                        message[clientNum] = String.join("  ", message[clientNum], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
-                        // Запись временных id для дальнейшего заполнения полученных результатов в таблицу
-                        tempList.add(listOfKeysOfRows.get(counter++) );
-                    }
-                    sendedRows_map.put(id[clientNum], tempList);
+            try {
+                int rowsCountForEachClient = records_map.size() / server.ClientCounter;
+                double rowsCountRemainder  = records_map.size() % server.ClientCounter;
+
+                int clientCountForMessages = server.ClientCounter < records_map.size()? server.ClientCounter : records_map.size();
+
+                LinkedList<Integer> listOfKeysOfRows = new LinkedList();
+                for (Map.Entry<Integer, LinkedList<String>> entry : records_map.entrySet()) {
+                    listOfKeysOfRows.add(entry.getKey());
                 }
-                for (int i = 0; i < rowsCountRemainder; i++)
+
+                // Получение списка id клиентов
+                int[] id = new int[server.list.size()];
                 {
-                    message[i] = String.join("  ", message[i], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
-                    
-                    LinkedList<Integer> tempList = sendedRows_map.get(id[i]);
-                    tempList.add(listOfKeysOfRows.get(counter++) );
-                    sendedRows_map.put(id[i], tempList);
+                    int ct = 0;
+                    for (Map.Entry<Integer, ClientObject> entry : server.list.entrySet()) 
+                        id[ct++] = entry.getKey();
                 }
-            }
-            
-            for (int i = 0; i < clientCountForMessages; i++) {
-                server.SendMessage(id[i], message[i]);
+                sendedRows_map = new TreeMap<>();
+                String[] message = new String[clientCountForMessages];
+                // Автоматическое распределение и заполнение массива отправляемых строк
+                { 
+                    int counter = 0;
+                    for (int clientNum = 0; clientNum < clientCountForMessages; clientNum++) {
+                        message[clientNum] = "$";
+                        LinkedList<Integer> tempList = new LinkedList<>();
+                        for (int i = 0; i < rowsCountForEachClient; i++)
+                        {
+                            message[clientNum] = String.join("  ", message[clientNum], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
+                            // Запись временных id для дальнейшего заполнения полученных результатов в таблицу
+                            tempList.add(listOfKeysOfRows.get(counter++) );
+                        }
+                        sendedRows_map.put(id[clientNum], tempList);
+                    }
+                    for (int i = 0; i < rowsCountRemainder; i++)
+                    {
+                        message[i] = String.join("  ", message[i], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
+
+                        LinkedList<Integer> tempList = sendedRows_map.get(id[i]);
+                        tempList.add(listOfKeysOfRows.get(counter++) );
+                        sendedRows_map.put(id[i], tempList);
+                    }
+                }
+
+                for (int i = 0; i < clientCountForMessages; i++) {
+                    server.SendMessage(id[i], message[i]);
+                }
+            } catch (Throwable ex)
+            {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
             }
         }
     }
@@ -449,7 +454,31 @@ public class Lab6 extends javax.swing.JFrame {
                 {0.01, 1.0, 0.001, null},
                 {0.01, 1.0, 0.01, null},
                 {0.1, 1.0, 0.001, null},
-                {0.1, 1.0, 0.01, null}
+                {0.1, 1.0, 0.01, null},
+                {1.001, 2.0, 0.001, null},
+                {1.001, 2.0, 0.01, null},
+                {1.01, 2.0, 0.001, null},
+                {1.01, 2.0, 0.01, null},
+                {1.1, 2.0, 0.001, null},
+                {1.1, 2.0, 0.01, null},
+                {2.001, 2.5, 0.001, null},
+                {2.001, 2.5, 0.01, null},
+                {2.01, 2.5, 0.001, null},
+                {2.01, 2.5, 0.01, null},
+                {2.1, 2.5, 0.001, null},
+                {2.1, 2.5, 0.01, null},
+                {2.5, 2.75, 0.001, null},
+                {2.5, 2.75, 0.01, null},
+                {2.75, 3.0, 0.001, null},
+                {2.75, 3.0, 0.01, null},
+                {2.5, 3.0, 0.001, null},
+                {2.5, 3.0, 0.01, null},
+                {3.001, 4.0, 0.001, null},
+                {3.001, 4.0, 0.01, null},
+                {3.01, 4.0, 0.001, null},
+                {3.01, 4.0, 0.01, null},
+                {3.1, 4.0, 0.001, null},
+                {3.1, 4.0, 0.01, null}
             },
             new String [] {
                 "Нижняя граница", "Верхняя граница", "Шаг интегрирования", "Результат"
@@ -572,75 +601,73 @@ public class Lab6 extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(LowerBoundTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(26, 26, 26)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(TableOrListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(AddButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(FormatFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(31, 31, 31)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(CalculateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(ClearButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(SaveToFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGap(53, 53, 53)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(DeleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(AddMembersButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(LoadFromFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(12, 12, 12)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
-                                        .addComponent(HigherBoundTextField))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(StepTextField)
-                                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)))))
-                        .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jScrollPane1)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(LowerBoundTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(TableOrListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(AddButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(FormatFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(31, 31, 31)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(CalculateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(ClearButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(SaveToFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(53, 53, 53)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(DeleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(AddMembersButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(LoadFromFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                                    .addComponent(HigherBoundTextField))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(StepTextField)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(ServerStatusLabel)))
+                        .addComponent(jScrollPane1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(ServerTextField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(SendMessageButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(ClientsCountTextLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ClientsCountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(ConsolePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(ConsolePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ServerStatusLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(ClientsCountTextLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ClientsCountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ClientsCountTextLabel)
-                    .addComponent(ServerStatusLabel)
-                    .addComponent(ClientsCountLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ClientsCountLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(ClientsCountTextLabel)
+                        .addComponent(ServerStatusLabel)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -662,18 +689,17 @@ public class Lab6 extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(TableOrListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(ClearButton)
-                            .addComponent(AddMembersButton))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(FormatFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(SaveToFileButton)
-                            .addComponent(LoadFromFileButton)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(ConsolePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(ServerTextField)
-                            .addComponent(SendMessageButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                            .addComponent(AddMembersButton)))
+                    .addComponent(ConsolePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(FormatFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SaveToFileButton)
+                        .addComponent(LoadFromFileButton))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(ServerTextField)
+                        .addComponent(SendMessageButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(14, 14, 14))
         );
 
