@@ -46,22 +46,22 @@ public class Lab6_client extends Thread {
     
     public static void main(String[] args) throws IOException {
         new Lab6_client();
-        try {
-            Scanner console = new Scanner(System.in);
-            System.out.println("Введите сообщения серверу(\"END\" завершает работу):");
-            while(!socket.isClosed()){
-                String str = console.nextLine();
-                if(str.equals("END"))
-                    break;
-                out.println(str);
-            }
-            out.println("END");
-        }
-        finally {
-            System.out.println("closing...");
-            if (!socket.isClosed())
-                socket.close();
-        }
+//        try {
+//            Scanner console = new Scanner(System.in);
+//            System.out.println("Введите сообщения серверу(\"END\" завершает работу):");
+//            while(!socket.isClosed()){
+//                String str = console.nextLine();
+//                if(str.equals("END"))
+//                    break;
+//                out.println(str);
+//            }
+//            out.println("END");
+//        }
+//        finally {
+//            System.out.println("closing...");
+//            if (!socket.isClosed())
+//                socket.close();
+//        }
     }
     
     @Override
@@ -77,8 +77,8 @@ public class Lab6_client extends Thread {
                 {
                     try{
                         msg = msg.replace(',','.');
-                        String[] arr = msg.substring(1).split("  ");
-                        String str_result = "";
+                        String[] arr = msg.substring(3).split("  ");
+                        String str_result = "$";
                         for (String str : arr)
                         {
                             String[] str_value = str.split(" ");
@@ -88,8 +88,7 @@ public class Lab6_client extends Thread {
                             for (int i = 0; i < 3; i++)
                                 value[i] = Double.parseDouble(str_value[i]);
 
-                            str_result += Calculate(value) + " ";
-
+                            str_result = String.join(" ",str_result, "" + Calculate(value));
                         }
                         if (!"".equals(str_result)) 
                         {

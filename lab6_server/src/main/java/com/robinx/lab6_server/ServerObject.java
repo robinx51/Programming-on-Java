@@ -11,9 +11,8 @@ public class ServerObject extends Thread {
     private static final int PORT = 8080;
     private final Lab6 form;
     public int ClientCounter = 0;
-    //public ArrayList<ClientObject> list;
     
-    private SortedMap<Integer, ClientObject> list;
+    public final SortedMap<Integer, ClientObject> list;
     
     public ServerObject(Lab6 form)
     {
@@ -24,6 +23,16 @@ public class ServerObject extends Thread {
     public void SendMessage(int id, String message)
     {
         list.get(id).out.println(message); // ClientObject.PrintWriter.println(messsage;)
+    }
+    public void LeaveClient(int id)
+    {
+        try{
+            list.remove(id);
+        } catch (Throwable ex)
+        {
+            JOptionPane.showMessageDialog(null, "Ошибка удаления клиента из списка");
+        }
+        form.LeaveClient(--ClientCounter);
     }
     
     @Override
@@ -39,16 +48,14 @@ public class ServerObject extends Thread {
             while (true) {
                 Socket socket = s.accept();
                 try {
-                    ClientCounter++;
                     ClientObject client = new ClientObject(socket, ++id, form, this);
-                    form.NewClient(ClientCounter);
+                    form.NewClient(++ClientCounter);
                     list.put(id, client);
                 }
                 catch (IOException e) {
-                    JOptionPane.showMessageDialog(null, "Зашёл");
+                    JOptionPane.showMessageDialog(null, "Ошибка создания ClientObject внутри цикла в ServerObject");
                     socket.close();
-                    ClientCounter--;
-                    form.LeaveClient(ClientCounter);
+                    LeaveClient(id);
                 }
             }
         } 

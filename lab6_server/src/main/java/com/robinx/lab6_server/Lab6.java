@@ -2,10 +2,12 @@ package com.robinx.lab6_server;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.concurrent.*;
-import java.util.LinkedList;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -13,7 +15,9 @@ public class Lab6 extends javax.swing.JFrame {
     private LinkedList<RecIntegral> list = new LinkedList<>();
     private final ServerObject server = new ServerObject(this);
     
-    private static JPanel messagePanel = new JPanel();
+    private static final JPanel messagePanel = new JPanel();
+    
+    private SortedMap<Integer, LinkedList<Integer> > sendedRows_map;
     
     public Lab6() {
         initComponents();
@@ -53,66 +57,93 @@ public class Lab6 extends javax.swing.JFrame {
         JScrollBar verticalScrollBar = ConsolePanel.getVerticalScrollBar();
         verticalScrollBar.setValue(verticalScrollBar.getMaximum());
     }
-    
-    private class MyThread implements Runnable {
-        private int rows[] = null;
-        
-        public MyThread(int[] rows)
+    public void SetResult(String msg, int ClientId)
+    {
+        String[] arr = msg.split(" ");
+        Double[] results = new Double[arr.length];
+        LinkedList<Integer> tempList = sendedRows_map.get(ClientId);
+        for (int row = 0; row < arr.length; row++)
         {
-            this.rows = rows;
-        }
-        
-        @Override
-        public void run()
-        {
-            for(int row : rows)
-            {
-                if (row != -1) {
-                    Object s1 = BoundTable.getValueAt(row, 0);
-                    Object s2 = BoundTable.getValueAt(row, 1);
-                    Object s3 = BoundTable.getValueAt(row, 2);
+            results[row] = Double.valueOf(arr[row]);
             
-                    if ( s1 != null & s2 != null & s3 != null)
-                    {
-                        Double a  = (Double) s1;
-                        Double b  = (Double) s2;
-                        Double h = (Double) s3;
-                        double sum = 0;
-                
-                        for (double x = a; x <= b; x += h) {
-                            double f = Math.sqrt(x) + Math.sqrt(x + h); // f(x) + f(x+h)
-                            double area = f * (h /2);                   // 1/2( f(x) + f(x+h) )
-                            sum += area;
-                            if (x + h > b) 
-                            {
-                                double edge = Math.sqrt(x) + Math.sqrt(b);
-                                double edgeArea = (b - x) * edge / 2;
-                                sum += edgeArea;
-                            }
-                        }
-                        TableModel model = BoundTable.getModel();
-                        model.setValueAt(sum, row, 3);
-                        JOptionPane.showMessageDialog(null, "Поток " + Thread.currentThread().getName() + " завершил работу с результатом: " + sum );
-                    }
-                else JOptionPane.showMessageDialog(null, "Один из параметров строки" + row + " не заполнен.");
+            TableModel model = BoundTable.getModel();
+            model.setValueAt(results[row], tempList.get(row), 3);
+        }
+    }
+    
+    public void Calculate()
+    {
+        SortedMap<Integer, LinkedList<String> > records_map = new TreeMap<>();
+        
+        DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) BoundTable.getSelectionModel();
+        for (int row = 0; row < BoundTable.getRowCount(); row++) {
+            if (selectionModel.isSelectedIndex(row)) {
+                LinkedList<String> li = new LinkedList();
+                {
+                    String[] values = new String[3];
+                    for (int i = 0; i < 3; i++)
+                        values[i] = String.valueOf(BoundTable.getValueAt(row, i));
+                    String str = String.join(" ", values);
+                    
+                    li.add(str);
                 }
+                records_map.put(row, li);
+            }
+        }
+        if (records_map.isEmpty() )
+        {
+            JOptionPane.showMessageDialog(null, "Выберите строки для вычисления");
+        }
+        else
+        {
+            int rowsCountForEachClient = records_map.size() / server.ClientCounter;
+            double rowsCountRemainder  = records_map.size() % server.ClientCounter;
+            
+            int clientCountForMessages = server.ClientCounter < records_map.size()? server.ClientCounter : records_map.size();
+            
+            LinkedList<Integer> listOfKeysOfRows = new LinkedList();
+            for (Map.Entry<Integer, LinkedList<String>> entry : records_map.entrySet()) {
+                listOfKeysOfRows.add(entry.getKey());
+            }
+            
+            // Получение списка id клиентов
+            int[] id = new int[server.list.size()];
+            {
+                int ct = 0;
+                for (Map.Entry<Integer, ClientObject> entry : server.list.entrySet()) 
+                    id[ct++] = entry.getKey();
+            }
+            sendedRows_map = new TreeMap<>();
+            String[] message = new String[clientCountForMessages];
+            // Автоматическое распределение и заполнение массива отправляемых строк
+            { 
+                int counter = 0;
+                for (int clientNum = 0; clientNum < rowsCountForEachClient; clientNum++) {
+                    message[clientNum] = "$";
+                    LinkedList<Integer> tempList = new LinkedList<>();
+                    for (int i = 0; i < clientCountForMessages; i++)
+                    {
+                        message[clientNum] = String.join("  ", message[clientNum], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
+                        // Запись временных id для дальнейшего заполнения полученных результатов в таблицу
+                        tempList.add(listOfKeysOfRows.get(counter++) );
+                    }
+                    sendedRows_map.put(id[clientNum], tempList);
+                }
+                for (int i = 0; i < rowsCountRemainder; i++)
+                {
+                    message[i] = String.join("  ", message[i], records_map.get(listOfKeysOfRows.get(counter)).get(0)  );
+                    
+                    LinkedList<Integer> tempList = sendedRows_map.get(id[i]);
+                    tempList.add(listOfKeysOfRows.get(counter++) );
+                    sendedRows_map.put(id[i], tempList);
+                }
+            }
+            
+            for (int i = 0; i < clientCountForMessages; i++) {
+                server.SendMessage(id[i], message[i]);
             }
         }
     }
-    private class NamedThreadFactory implements ThreadFactory {
-        private final String namePrefix;
-
-        public NamedThreadFactory(String namePrefix) {
-            this.namePrefix = namePrefix;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName(namePrefix + "-" + t.getId());
-            return t;
-        }
-}
     
     private boolean Check(double a, double b, double h) throws RecordException
     {
@@ -162,36 +193,7 @@ public class Lab6 extends javax.swing.JFrame {
         }
         else JOptionPane.showMessageDialog(null, "Один из параметров не заполнен.");
     }
-    public void Calculate()
-    {
-        int[] tempRows = new int[BoundTable.getRowCount()];
-        int count = 0;
-        DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) BoundTable.getSelectionModel();
-        for (int i = 0; i < BoundTable.getRowCount(); i++) {
-            if (selectionModel.isSelectedIndex(i)) {
-                tempRows[count++] = i;
-            }
-        }
-        int[] rows = new int[count];
-        System.arraycopy(tempRows, 0, rows, 0, count);
-        
-        if (count > 6)
-        {
-            JOptionPane.showMessageDialog(null, "Выберите до 6-ти строк для вычисления");
-        }
-        else 
-        {
-            ExecutorService executor = Executors.newFixedThreadPool(count > 6 ? 6 : count, 
-                    new NamedThreadFactory("ВычислительныйПоток"));
-            for (int i = 0; i < count; i++) {
-                int [] row = new int[1];
-                row[0] = rows[i];
-                Runnable task = new MyThread(row);
-                executor.execute(task);
-            }
-            executor.shutdown();
-        }
-    }
+    
     public void DeleteLine()
     {
         int row = BoundTable.getSelectedRow();
@@ -383,7 +385,7 @@ public class Lab6 extends javax.swing.JFrame {
             }
         }
     }
-        
+    
     public void Save() {
         if ("Текстовый".equals((String)FormatFileComboBox.getSelectedItem()))
         {

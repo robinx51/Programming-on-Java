@@ -29,8 +29,9 @@ public class ClientObject extends Thread {
                 String str = in.readLine();
                 if (str.equals("END"))
                     break;
+                else if (str.startsWith("$"))
+                    form.SetResult(str.substring(3), ClientId);
                 form.NewMessage("Client " + ClientId + ": " + str);
-                //out.println(str);
             }
         }
         catch (IOException e) {
@@ -40,11 +41,11 @@ public class ClientObject extends Thread {
             try {
                 form.NewMessage("Closing client " + ClientId + "...");
                 socket.close();
-                form.LeaveClient(--server.ClientCounter);
+                server.LeaveClient(ClientId);
             }
             catch (IOException e) {
                 form.NewMessage("Socket not closed from Client" + ClientId);
-            } 
-        } 
+            }
+        }
     }
 }
