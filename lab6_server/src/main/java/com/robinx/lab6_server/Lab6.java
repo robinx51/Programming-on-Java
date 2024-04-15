@@ -16,7 +16,7 @@ public class Lab6 extends javax.swing.JFrame {
     private final ServerObject server = new ServerObject(this);
     
     private static final JPanel messagePanel = new JPanel();
-    
+     
     private SortedMap<Integer, LinkedList<Integer> > sendedRows_map;
     
     public Lab6() {

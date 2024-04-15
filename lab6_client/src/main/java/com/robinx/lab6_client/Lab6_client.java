@@ -73,8 +73,9 @@ public class Lab6_client extends Thread {
                 String msg = in.readLine();
                 if ("END".equals(msg)) 
                     break;
-                else if(msg.startsWith("$")) // protocol: "@id|$LowerBound UpperBound Step  LowerBound..."
+                else if(msg.startsWith("$")) // protocol: "@id|$  LowerBound UpperBound Step  LowerBound..."
                 {
+                    // Обработка сообщения и вычисление функции
                     try{
                         msg = msg.replace(',','.');
                         String[] arr = msg.substring(3).split("  ");
@@ -96,7 +97,8 @@ public class Lab6_client extends Thread {
                             System.out.println("Вычисления завершены с результатами:" + str_result);
                         }
                         else System.out.println("Вычисления не были выполнены");
-                    } catch (Throwable  ex) { 
+                    } 
+                    catch (Throwable  ex) { 
                         System.out.println("Обработка вычислений завершена с ошибкой: " + ex.getMessage() ); 
                     }
                 }

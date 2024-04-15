@@ -11,7 +11,8 @@ public class ClientObject extends Thread {
     private final Lab6 form;
     private final ServerObject server;
     
-    public ClientObject(Socket s, int num, Lab6 form, ServerObject server) throws IOException {
+    public ClientObject(Socket s, int num, Lab6 form, ServerObject server) 
+            throws IOException {
         socket = s;
         ClientId = num;
         this.form = form;

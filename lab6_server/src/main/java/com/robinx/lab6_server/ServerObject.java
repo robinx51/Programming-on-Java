@@ -81,30 +81,3 @@ public class ServerObject extends Thread {
         }
     }
 }
-    /*public static void main(String[] args) throws IOException {
-        ServerSocket s = new ServerSocket(PORT);
-        form = new Lab6();
-        form.ServerStatusLabel.setText("Сервер запущен");
-        form.ServerStatusLabel.setForeground(Color.green);
-        form.setVisible(true);
-        
-        try {
-            while (true) {
-                Socket socket = s.accept();
-                try {
-                    new ClientObject(socket, ClientCounter);
-                    ClientCounter++;
-                    form.NewClient(ClientCounter);
-                }
-                catch (IOException e) {
-                    socket.close();
-                    ClientCounter--;
-                }
-            }
-        }
-        finally {
-            s.close();
-            form.ServerStatusLabel.setText("Сервер не запущен");
-            form.ServerStatusLabel.setForeground(Color.red);
-        }
-    }*/
