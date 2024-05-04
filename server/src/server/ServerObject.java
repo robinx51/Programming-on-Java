@@ -164,8 +164,11 @@ public class ServerObject extends Thread {
             while (!this.isInterrupted()) {
                 Socket socket = s.accept();
                 try {
-                    ClientObject client = new ClientObject(socket, this);
+                    int port = socket.getPort();
+                    ClientObject client = new ClientObject(socket, port, this);
                     client.start();
+                    System.out.println("Новый клиент " + port );
+                    list.put(port, client);
                 }
                 catch (IOException e) {
                     System.out.println("Ошибка создания ClientObject внутри цикла в ServerObject");
@@ -175,7 +178,7 @@ public class ServerObject extends Thread {
         } catch (SocketException e) {
             System.out.println("Сокет сервера был закрыт");
         } catch (IOException e) {
-            System.err.println("Сервер выдал исключение");
+            System.err.println(e.getMessage());
         }
         finally {
             StopServer();

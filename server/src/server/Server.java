@@ -27,7 +27,7 @@ public class Server {
             }
             else if (str.equals("start")|| str.equals("старт"))
                 StartServer();
-            //else if (str.startsWith("close")) // отключить клиента
+            //else server.HandleMessage("");
         }
     }
     

@@ -11,12 +11,12 @@ public class ClientObject extends Thread {
     private int ClientId;
     private String ClientName;
     
-    public ClientObject(Socket socket, ServerObject server) throws IOException {
+    public ClientObject(Socket socket, int port, ServerObject server) throws IOException {
         this.server = server;
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-        ClientId = -1;
+        ClientId = port;
         ClientName = "$NONAME$";
     }
     
@@ -81,10 +81,10 @@ public class ClientObject extends Thread {
     public void run() {
         try {
             OUTER:
-            while (true) {
+            while (!socket.isClosed() && !server.s.isClosed()) {
                 String message = in.readLine();
                 if (null == message) {
-                    continue;
+                    break;
                 } else {
                     switch (message) {
                         case "/online" -> {
@@ -100,7 +100,7 @@ public class ClientObject extends Thread {
             }
         }
         catch (IOException e) {
-            System.err.println("IOException от клиента " + ClientId);
+            System.err.println("IOException from client " + ClientId);
         }
         finally {
             System.out.println("Закрытие клиента " + ClientId + "...");
