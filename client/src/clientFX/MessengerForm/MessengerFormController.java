@@ -9,18 +9,28 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 
-public class ClientFXMLController implements Initializable {
+public class MessengerFormController implements Initializable {
     public boolean statusApp;
     private ClientObject client;
+    private String ClientName;
 
     @FXML
     private Label ConnStatusLabel;
     @FXML
     private Button ReconnButton;
+    @FXML
+    private Label HelloLabel;
+    @FXML
+    private AnchorPane noChatPanel;
+    @FXML
+    private AnchorPane NoUsersPanel;
     
-    public void SetClient(ClientObject client) {
+    public void SetClient(ClientObject client, String name) {
         this.client = client;
+        ClientName = name;
+        HelloLabel.setText("Привет, " + name + '!');
     }
     
     public void SetConn(boolean status) {
@@ -67,8 +77,8 @@ public class ClientFXMLController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //Tooltip tooltip = new Tooltip("Это кнопка для выполнения какого-то действия");
-    }
+        // TODO
+    }    
     
     @FXML
     private void HandleReconnButton(ActionEvent event) {

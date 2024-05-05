@@ -13,7 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
-public class ClientFXMLController implements Initializable {
+public class LoginFormController implements Initializable {
     public boolean statusApp;
     private ClientObject client;
 
@@ -77,21 +77,11 @@ public class ClientFXMLController implements Initializable {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION);
             switch (type){
-                case "info":
-                    alert.setAlertType(AlertType.INFORMATION);
-                    break;
-                case "confirm":
-                    alert.setAlertType(AlertType.CONFIRMATION);
-                    break;
-                case "warning":
-                    alert.setAlertType(AlertType.WARNING);
-                    break;
-                case "error":
-                    alert.setAlertType(AlertType.ERROR);
-                    break;
-                case "none":
-                    alert.setAlertType(AlertType.NONE);
-                    break;
+                case "info" -> alert.setAlertType(AlertType.INFORMATION);
+                case "confirm" -> alert.setAlertType(AlertType.CONFIRMATION);
+                case "warning" -> alert.setAlertType(AlertType.WARNING);
+                case "error" -> alert.setAlertType(AlertType.ERROR);
+                case "none" -> alert.setAlertType(AlertType.NONE);
             }
             alert.setTitle(title);
             alert.setHeaderText(message);
@@ -168,7 +158,6 @@ public class ClientFXMLController implements Initializable {
 
     @FXML
     private void HandleReconnButton(ActionEvent event) {
-        ClientObject client = new ClientObject(this);
         client.ConnectToServer();
     }
     

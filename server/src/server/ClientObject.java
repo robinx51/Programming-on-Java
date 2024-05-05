@@ -60,7 +60,7 @@ public class ClientObject extends Thread {
                 switch (options) {
                     case "log" -> {
                         if(server.LogClient(text, this))
-                            server.SendMessage(ClientId, "#log|accept");
+                            server.SendMessage(ClientId, "#log|" + ClientName);
                         else server.SendMessage(ClientId, "#log|reject");
                     }
                     case "reg" -> {
