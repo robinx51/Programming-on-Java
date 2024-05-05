@@ -1,5 +1,6 @@
 package clientFX;
 
+import clientFX.LoginForm.ClientFXMLController;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javafx.application.Platform;
 
 public class ClientObject extends Thread {
         private static Socket socket;
@@ -20,9 +22,16 @@ public class ClientObject extends Thread {
             this.fxml = fxml;
         }
         
+        public void SendMessage(String message) {
+            Platform.runLater(() -> {
+                if (!socket.isClosed())
+                    out.println(message);
+            });
+        }
+        
         public void CloseClient() {
             try{
-                if (socket != null &&!socket.isClosed()) {
+                if (socket != null && !socket.isClosed()) {
                     //out.println("/close");
                     socket.close();
                     this.interrupt(); 
@@ -37,26 +46,67 @@ public class ClientObject extends Thread {
                 // Передаем null в getByName()
                 InetAddress addr = InetAddress.getByName("localhost");
 
-                System.out.println("addr = " + addr);
                 socket = new Socket(addr, 8080);
                 System.out.println("socket = " + socket);
-
+                
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 // Вывод автоматически Output выталкивается PrintWriter'ом.
                 out = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream())), true);
                 fxml.SetConn(true);
+                start();
             } catch (UnknownHostException e){
                 System.out.println(e.getMessage());
             } catch (IOException e){
                 System.out.println(e.getMessage());
             }
             
-            start();
         }
         
-        private void HandleMessage() {
+        private void HandleMessage(String message) {
             
+            if (message.contains("|")) {
+                String options, text;
+                {
+                    String[] strings = message.split("\\|");
+                    options = strings[0];
+                    text = strings[1];
+                }
+                if (options.startsWith("&")) {
+                    options = options.substring(1);
+                    int TargetId = Integer.parseInt(options);
+                    switch (TargetId) {
+                        case 0 -> {
+                            text = "&0|" + 0 + ':' + text;
+                            // Общий диалог
+                        }
+                        default -> {
+                            text = "&server|" + text;
+                            // Личное сообщение
+                        }
+                    }
+                } else if (options.startsWith("#")) {
+                    options = options.substring(1);
+                    if ("log".equals(options)) {
+                        if ("accept".equals(text)) {
+                            fxml.MessageBox("Получен ответ от сервера", "Успешный вход!", "confirm");
+                        }
+                        else if ("reject".equals(text))
+                            fxml.MessageBox("Получен ответ от сервера", "Ошибка входа", "error");
+                    } else if ("reg".equals(options)) {
+                        if ("accept".equals(text)) {
+                            fxml.MessageBox("Получен ответ от сервера", "Успешная регистрация!", "confirm");
+                            fxml.SuccessfulReg();
+                        }
+                        else if ("reject".equals(text))
+                            fxml.MessageBox("Получен ответ от сервера", "Ошибка регистрации", "error");
+                    }
+                }
+            } else if (message.startsWith("%")) {
+                fxml.MessageBox("Сообщение от сервера", message.substring(1), "info");
+            }
+            else 
+                System.err.println("Unprocessed request: " + message);
         }
         
         @Override
@@ -66,10 +116,12 @@ public class ClientObject extends Thread {
                 while(!socket.isClosed())
                 {
                     String msg = in.readLine();
-                    if ("/close".equals(msg)) 
+                    if (msg == null)
                         break;
-                    else HandleMessage();
-                    System.out.println("Сообщение от сервера: " + msg);
+                    else if ("/close".equals(msg)) 
+                        break;
+                    else HandleMessage(msg);
+                    System.out.println("Server: " + msg);
                 }
             } catch(IOException ex) {
                 System.out.println(ex.getMessage());

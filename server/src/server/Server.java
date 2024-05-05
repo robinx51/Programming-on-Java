@@ -17,17 +17,14 @@ public class Server {
         StartServer();
         Scanner console = new Scanner(System.in);
         
-        while (!server.s.isClosed())
-        {
+        while (!server.s.isClosed()) {
             String str = console.nextLine();
-            if(str.equals("stop") || str.equals("стоп"))
-            { 
+            if(str.equals("stop") || str.equals("стоп")) { 
                 server.StopServer();
                 break;
-            }
-            else if (str.equals("start")|| str.equals("старт"))
+            } else if (str.equals("start")|| str.equals("старт"))
                 StartServer();
-            //else server.HandleMessage("");
+            else server.HandleMessage(str);
         }
     }
     

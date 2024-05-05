@@ -16,6 +16,36 @@ public class ServerObject extends Thread {
         ConnectToDB();
     }
     
+    public void HandleMessage(String message) {
+        if (message.contains("|")) {
+            String options, text;
+            {
+                String[] strings = message.split("\\|");
+                options = strings[0];
+                text = strings[1];
+            }
+            if (options.startsWith("@")) {
+                options = options.substring(1);
+                int TargetId = Integer.parseInt(options);
+                switch (TargetId) {
+                    case 0 -> {
+                        text = "&0|" + 0 + ':' + text;
+                        BroadcastMessage(0, text);
+                    }
+                    default -> {
+                        text = "%" + text;
+                        SendMessage(TargetId, text);
+                    }
+                }
+            } else if ("/close".equals(options) && text.matches("[0-9]+")) {
+                int TargetId = Integer.parseInt(text);
+                CloseClient(TargetId);
+            }
+        }
+        else 
+            System.out.println("Необработанный запрос: " + message);
+    }
+    
     public String GetOnlineClients(int SenderId){
         List<String> ids = new ArrayList<>();
         List<String> names = new ArrayList<>();
@@ -103,12 +133,15 @@ public class ServerObject extends Thread {
             if (resultSet.next()) {
                 id = resultSet.getInt(1); // Чтение значения из первого столбца результата
                 String name = resultSet.getString(2);
-                
-                client.SetId(id);
-                client.SetName(name);
-                list.put(id, client);
-                if (list.size() > 1)
-                    BroadcastMessage(id, "#new|" + name + ":" + id);
+                if (id != 0) {
+                    list.remove(client.GetId());
+                    System.out.println("Смена id клиента " + client.GetId() + " -> " + id);
+                    client.SetId(id);
+                    client.SetName(name);
+                    list.put(id, client);
+                    if (list.size() > 1)
+                        BroadcastMessage(id, "#new|" + name + ":" + id);
+                }
             }
         } catch (SQLException e)
         {   System.err.println("Error accessing database!"); }
@@ -118,12 +151,28 @@ public class ServerObject extends Thread {
     public void StopServer() 
     {
         try {
+            for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
+                ClientObject clientObj = client.getValue();
+                clientObj.socket.close();
+            }
             if (s != null && !s.isClosed())
                 s.close();
             this.interrupt(); // Прерываем поток
         } catch(IOException ex) {
             System.err.println("Ошибка при закрытии сокета сервера");
         }
+    }
+    private void CloseClient(int id) {
+        ClientObject client = list.get(id);
+        try{
+            
+            if (!client.socket.isClosed()) {
+                client.socket.close();
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        
     }
 
     public void SendMessage(int id, String message)

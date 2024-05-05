@@ -29,6 +29,9 @@ public class ClientObject extends Thread {
     public String GetName(){
         return ClientName;
     }
+    public int GetId(){
+        return ClientId;
+    }
     
     public void HandleMessage(String message) {
         if (message.contains("|")) {
@@ -65,15 +68,15 @@ public class ClientObject extends Thread {
                             server.SendMessage(ClientId, "#reg|accept");
                         else server.SendMessage(ClientId, "#reg|reject");
                     }
-                    default -> System.out.println("Необработанный запрос: " + text);
+                    default -> System.err.println("Unprocessed request: " + text);
                 }
             }
             else {
-                System.out.println("Необработанный запрос: " + message);
+                System.err.println("Unprocessed request: " + message);
             }
         }
         else {
-            System.out.println("Необработанный запрос: " + message);
+            System.err.println("Unprocessed request: " + message);
         }
     }
     
@@ -83,7 +86,7 @@ public class ClientObject extends Thread {
             OUTER:
             while (!socket.isClosed() && !server.s.isClosed()) {
                 String message = in.readLine();
-                if (null == message) {
+                if (message == null) {
                     break;
                 } else {
                     switch (message) {
