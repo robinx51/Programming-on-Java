@@ -2,20 +2,21 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="MessengerForm" prefHeight="500.0" prefWidth="850.0" style="-fx-background-color: #086fa1;" styleClass="MessengerForm" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientFX.MessengerForm.MessengerFormController">
+<AnchorPane id="MessengerForm" prefHeight="500.0" prefWidth="850.0" style="-fx-background-color: #086fa1;" styleClass="MessengerForm" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientFX.MessengerForm.MessengerFormController">
    <children>
-      <Label fx:id="ConnStatusLabel" alignment="CENTER" contentDisplay="TOP" layoutX="311.0" layoutY="473.0" prefHeight="18.0" prefWidth="227.0" text="Подключение к серверу не установлено" textAlignment="CENTER" textFill="RED" />
-      <Button fx:id="ReconnButton" layoutX="579.0" layoutY="469.0" mnemonicParsing="false" onAction="#HandleReconnButton" style="-fx-background-color: orange red;" text="Подключиться" textFill="WHITE" />
-      <Button id="BackButton" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" prefHeight="412.0" prefWidth="36.0" styleClass="Button" text="&lt;" />
+      <Label id="ReconnLabel" fx:id="ConnStatusLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="588.0" layoutY="472.0" prefHeight="18.0" prefWidth="227.0" text="Подключение к серверу не установлено" textAlignment="CENTER" textFill="RED" />
+      <Button fx:id="ReconnButton" layoutX="470.0" layoutY="469.0" mnemonicParsing="false" onAction="#HandleReconnButton" style="-fx-background-color: orange red;" text="Подключиться" textFill="WHITE" />
+      <Button id="BackButton" fx:id="BackButton" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" onAction="#HandleBackButton" prefHeight="424.0" prefWidth="36.0" />
       <Label fx:id="HelloLabel" layoutX="16.0" layoutY="8.0" style="-fx-font-weight: bold;" text="Привет, " textFill="WHITE">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
-      <AnchorPane fx:id="noChatPanel" layoutX="78.0" layoutY="39.0" prefHeight="412.0" prefWidth="440.0" styleClass="panel">
+      <AnchorPane fx:id="noChatPanel" layoutX="78.0" layoutY="39.0" prefHeight="424.0" prefWidth="440.0" styleClass="panel">
          <children>
             <Label layoutX="88.0" layoutY="196.0" text="Выберите собеседника из списка справа" textFill="WHITE">
                <font>
@@ -24,13 +25,20 @@
             </Label>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="NoUsersPanel" layoutX="534.0" layoutY="39.0" prefHeight="412.0" prefWidth="282.0" styleClass="panel">
+      <AnchorPane fx:id="NoUsersPanel" layoutX="534.0" layoutY="39.0" prefHeight="424.0" prefWidth="282.0" styleClass="panel">
          <children>
             <Label layoutX="55.0" layoutY="196.0" text="Список собеседников пуст" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="ChatPanel" layoutX="78.0" layoutY="39.0" prefHeight="424.0" prefWidth="440.0" styleClass="panel">
+         <children>
+            <TextField id="messageField" fx:id="MessageField" layoutX="21.0" layoutY="377.0" onKeyPressed="#HandleMessageField" prefHeight="32.0" prefWidth="341.0" promptText="Напишите сообщение..." styleClass="textField" />
+            <Button id="sendButton" fx:id="SendButton" alignment="CENTER" contentDisplay="CENTER" layoutX="394.0" layoutY="377.0" mnemonicParsing="false" onAction="#HandleSendButton" prefHeight="32.0" prefWidth="32.0" stylesheets="@../style.css">
+               </Button>
          </children>
       </AnchorPane>
    </children>  

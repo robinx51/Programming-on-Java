@@ -17,33 +17,35 @@ public class ServerObject extends Thread {
     }
     
     public void HandleMessage(String message) {
-        if (message.contains("|")) {
-            String options, text;
-            {
-                String[] strings = message.split("\\|");
-                options = strings[0];
-                text = strings[1];
-            }
-            if (options.startsWith("@")) {
-                options = options.substring(1);
-                int TargetId = Integer.parseInt(options);
-                switch (TargetId) {
-                    case 0 -> {
-                        text = "&0|" + 0 + ':' + text;
-                        BroadcastMessage(0, text);
-                    }
-                    default -> {
-                        text = "%" + text;
-                        SendMessage(TargetId, text);
-                    }
+        try {
+            if (message.contains("|")) {
+                String options, text;
+                {
+                    String[] strings = message.split("\\|");
+                    options = strings[0];
+                    text = strings[1];
                 }
-            } else if ("/close".equals(options) && text.matches("[0-9]+")) {
-                int TargetId = Integer.parseInt(text);
-                CloseClient(TargetId);
-            }
+                if (options.startsWith("@")) {
+                    options = options.substring(1);
+                    int TargetId = Integer.parseInt(options);
+                    switch (TargetId) {
+                        case 0 -> {
+                            text = "&0|" + 0 + ':' + text;
+                            BroadcastMessage(0, text);
+                        } default -> {
+                            text = "%" + text;
+                            SendMessage(TargetId, text);
+                        }
+                    }
+                } else if ("/close".equals(options) && text.matches("[0-9]+")) {
+                    int TargetId = Integer.parseInt(text);
+                    CloseClient(TargetId);
+                }
+            } else 
+                System.out.println("Необработанный запрос: " + message);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
-        else 
-            System.out.println("Необработанный запрос: " + message);
     }
     
     public String GetOnlineClients(int SenderId){
@@ -63,8 +65,7 @@ public class ServerObject extends Thread {
         return message;
     }
     
-    private void ConnectToDB()
-    {
+    private void ConnectToDB() {
         try
         {
             Class.forName("org.postgresql.Driver");
@@ -84,8 +85,7 @@ public class ServerObject extends Thread {
             System.err.println("Error accessing database!");
         }
     }
-    private Boolean IsLoginExist(String login)
-    {
+    private Boolean IsLoginExist(String login) {
         String query = "select is_login_exist(?)";
         try{
             PreparedStatement statement = connection.prepareStatement(query);
@@ -99,8 +99,7 @@ public class ServerObject extends Thread {
         {   System.err.println("Error accessing database!"); }
         return false;
     }
-    public boolean RegClient(String message)
-    {
+    public boolean RegClient(String message) {
         String[] data = message.split(" "); // "name login password"
         if (IsLoginExist(data[1]))
             return false;
@@ -119,8 +118,7 @@ public class ServerObject extends Thread {
         {   System.err.println("Error accessing database!"); }
         return false;
     }
-    public boolean LogClient(String message, ClientObject client)
-    {
+    public boolean LogClient(String message, ClientObject client) {
         String[] data = message.split(" "); // "login password"
         String query = "select * from check_login(?, ?)";
         int id = 0;
@@ -134,11 +132,8 @@ public class ServerObject extends Thread {
                 id = resultSet.getInt(1); // Чтение значения из первого столбца результата
                 String name = resultSet.getString(2);
                 if (id != 0) {
-                    list.remove(client.GetId());
-                    System.out.println("Смена id клиента " + client.GetId() + " -> " + id);
-                    client.SetId(id);
+                    ChangeIdClient(client.GetId(), id);
                     client.SetName(name);
-                    list.put(id, client);
                     if (list.size() > 1)
                         BroadcastMessage(id, "#new|" + name + ":" + id);
                 }
@@ -148,8 +143,7 @@ public class ServerObject extends Thread {
         return id != 0;
     }
     
-    public void StopServer() 
-    {
+    public void StopServer() {
         try {
             for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
                 ClientObject clientObj = client.getValue();
@@ -162,43 +156,48 @@ public class ServerObject extends Thread {
             System.err.println("Ошибка при закрытии сокета сервера");
         }
     }
-    private void CloseClient(int id) {
+    public void CloseClient(int id) {
         ClientObject client = list.get(id);
-        try{
-            
+        try {
             if (!client.socket.isClosed()) {
                 client.socket.close();
+                BroadcastMessage(id, "#leave|" + id);
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        
+    }
+    public void LeaveClient(int id) {
+        BroadcastMessage(id, "#leave|" + id);
+        ClientObject client = list.get(id);
+        ChangeIdClient(client.GetId(),client.socket.getPort());
+    }
+    public void ChangeIdClient (int oldId, int newId) {
+        ClientObject client = list.get(oldId);
+        list.remove(oldId);
+        client.SetId(newId);
+        System.out.println("Смена id клиента " + oldId + " -> " + newId);
+        list.put(newId, client);
     }
 
-    public void SendMessage(int id, String message)
-    {
-        list.get(id).out.println(message);
-    }
-    public void BroadcastMessage(int SenderId, String message)
-    {
-        for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
-            int id = client.getKey();
-            if (id != SenderId) {
-                ClientObject clientObj = client.getValue();
-                clientObj.out.println(message);
-            }
+    public void SendMessage(int id, String message) {
+        try {
+            list.get(id).out.println(message);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
-    
-    public void LeaveClient(int id)
-    {
-        try{
-            if (!list.get(id).socket.isClosed())
-                list.get(id).socket.close();
-            BroadcastMessage(id, "#leave|" + id);
-            list.remove(id);
-        } catch (IOException ex) {
-            System.err.println("Ошибка закрытия клиента");
+    public void BroadcastMessage(int SenderId, String message) {
+        try {
+            for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
+                int id = client.getKey();
+                if (id != SenderId) {
+                    ClientObject clientObj = client.getValue();
+                    clientObj.out.println(message);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
     

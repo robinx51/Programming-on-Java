@@ -3,33 +3,40 @@ package clientFX.MessengerForm;
 import clientFX.ClientObject;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.SortedMap;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class MessengerFormController implements Initializable {
     public boolean statusApp;
     private ClientObject client;
-    private String ClientName;
-
+    private int activeFriendId = 0;
+    private SortedMap<Integer, String> list;
+    
     @FXML
-    private Label ConnStatusLabel;
-    @FXML
+    private Button BackButton; @FXML 
+    private Label HelloLabel; @FXML
+    private Label ConnStatusLabel; @FXML
     private Button ReconnButton;
+    
     @FXML
-    private Label HelloLabel;
-    @FXML
-    private AnchorPane noChatPanel;
+    private AnchorPane noChatPanel; @FXML
+    private AnchorPane ChatPanel; @FXML
+    private TextField MessageField; @FXML
+    private Button SendButton;
+    
     @FXML
     private AnchorPane NoUsersPanel;
     
     public void SetClient(ClientObject client, String name) {
         this.client = client;
-        ClientName = name;
         HelloLabel.setText("Привет, " + name + '!');
     }
     
@@ -37,13 +44,11 @@ public class MessengerFormController implements Initializable {
         Platform.runLater(() -> {
             if (status) {
                 statusApp = true;
-                ConnStatusLabel.setText("Подключение к серверу установлено");
-                ConnStatusLabel.setStyle("-fx-text-fill: #37da7e;");
+                ConnStatusLabel.setVisible(false);
                 ReconnButton.setVisible(false);
             } else {
                 statusApp = false;
-                ConnStatusLabel.setText("Подключение к серверу не установлено");
-                ConnStatusLabel.setStyle("-fx-text-fill: red;");
+                ConnStatusLabel.setVisible(true);
                 ReconnButton.setVisible(true);
             }
         });
@@ -53,21 +58,11 @@ public class MessengerFormController implements Initializable {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION);
             switch (type){
-                case "info":
-                    alert.setAlertType(AlertType.INFORMATION);
-                    break;
-                case "confirm":
-                    alert.setAlertType(AlertType.CONFIRMATION);
-                    break;
-                case "warning":
-                    alert.setAlertType(AlertType.WARNING);
-                    break;
-                case "error":
-                    alert.setAlertType(AlertType.ERROR);
-                    break;
-                case "none":
-                    alert.setAlertType(AlertType.NONE);
-                    break;
+                case "info" -> alert.setAlertType(AlertType.INFORMATION);
+                case "confirm" -> alert.setAlertType(AlertType.CONFIRMATION);
+                case "warning" -> alert.setAlertType(AlertType.WARNING);
+                case "error" -> alert.setAlertType(AlertType.ERROR);
+                case "none" -> alert.setAlertType(AlertType.NONE);
             }
             alert.setTitle(title);
             alert.setHeaderText(message);
@@ -77,13 +72,34 @@ public class MessengerFormController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+        Tooltip tooltip = new Tooltip("Отправить сообщение");
+        SendButton.setTooltip(tooltip);
+        tooltip = new Tooltip("Вернуться на страницу авторизации");
+        BackButton.setTooltip(tooltip);
+    }
     
     @FXML
+    private void HandleBackButton(ActionEvent event) {
+        client.mainThread.OpenAuth();
+    } @FXML
     private void HandleReconnButton(ActionEvent event) {
-        //ClientObject client = new ClientObject(this);
         client.ConnectToServer();
+    } @FXML
+    private void HandleMessageField(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER)
+            SendButton.fire();
+    } @FXML
+    private void HandleSendButton(ActionEvent event) { 
+        //MessageBox("Нажал на кнопку","Отправишь сообщение потом","info");
+        if (MessageField.getText().length() > 1) {
+            String message = MessageField.getText();
+            try {
+                client.SendMessage("@" + activeFriendId + "|" + message);
+                MessageField.setText("");
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            } 
+        }
     }
     
 }

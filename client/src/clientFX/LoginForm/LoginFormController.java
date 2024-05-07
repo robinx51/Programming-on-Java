@@ -1,5 +1,6 @@
 package clientFX.LoginForm;
 
+import clientFX.Client;
 import clientFX.ClientObject;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -12,10 +13,13 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
+import javafx.animation.FillTransition;
 
 public class LoginFormController implements Initializable {
     public boolean statusApp;
     private ClientObject client;
+    private Client mainThread;
 
     @FXML
     private Button LoginButton;
@@ -45,25 +49,33 @@ public class LoginFormController implements Initializable {
     private Label ConnStatusLabel;
     @FXML
     private Button ReconnButton;
+    @FXML
+    public Button FastLogin;
     
+    public void SetClient(ClientObject client, Client mainTh) {
+        this.client = client;
+        mainThread = mainTh;
+    }
     public void SetClient(ClientObject client) {
         this.client = client;
     }
-    
     public void SetConn(boolean status) {
         Platform.runLater(() -> {
             if (status) {
                 statusApp = true;
-                ConnStatusLabel.setText("Подключение к серверу установлено");
-                ConnStatusLabel.setStyle("-fx-text-fill: #37da7e;");
+                ConnStatusLabel.setVisible(false);
                 ReconnButton.setVisible(false);
             } else {
                 statusApp = false;
-                ConnStatusLabel.setText("Подключение к серверу не установлено");
-                ConnStatusLabel.setStyle("-fx-text-fill: red;");
+                ConnStatusLabel.setVisible(true);
                 ReconnButton.setVisible(true);
             }
         });
+    }
+    
+    public void ClearLoginPanel() {
+        LoginFieldLog.setText("");
+        PasswordFieldLog.setText("");
     }
     
     public void SuccessfulReg() {
@@ -137,11 +149,10 @@ public class LoginFormController implements Initializable {
             MessageBox("Ошибка ввода","Минимальная длина каждого поля - 3 символа","warning");
         }
     }
+    
     @FXML
     private void HandleLogPanelButton(ActionEvent event) {
         LoginPanel.toFront();
-        LoginPanelButton.setStyle("-fx-background-color: #37da7e;");
-        RegPanelButton.setStyle("-fx-background-color: #778899;");
         NameFieldReg.setText("");
         LoginFieldReg.setText("");
         PasswordFieldReg.setText("");
@@ -150,15 +161,18 @@ public class LoginFormController implements Initializable {
     @FXML
     private void HandleRegPanelButton(ActionEvent event) {
         RegPanel.toFront();
-        RegPanelButton.setStyle("-fx-background-color: #37da7e;");
-        LoginPanelButton.setStyle("-fx-background-color: #778899;");
-        LoginFieldLog.setText("");
-        PasswordFieldLog.setText("");
+        ClearLoginPanel();
     }
 
     @FXML
     private void HandleReconnButton(ActionEvent event) {
-        client.ConnectToServer();
+        mainThread.ConnectToServer();
+    }
+    
+    @FXML
+    private void HandleFastLogin(ActionEvent event) {
+        String message = "#log|robinx51 123";
+        client.SendMessage(message);
     }
     
 }

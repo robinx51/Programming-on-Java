@@ -48,34 +48,28 @@ public class ClientObject extends Thread {
                     case 0 -> {
                         text = "&0|" + ClientId + ':' + text;
                         server.BroadcastMessage(ClientId, text);
-                    }
-                    default -> {
+                    } default -> {
                         text = '&' + ClientId + '|' + text;
                         server.SendMessage(TargetId, text);
                     }
                 }
-            }
-            else if (options.startsWith("#")) {
+            } else if (options.startsWith("#")) {
                 options = options.substring(1);
                 switch (options) {
                     case "log" -> {
                         if(server.LogClient(text, this))
                             server.SendMessage(ClientId, "#log|" + ClientName);
                         else server.SendMessage(ClientId, "#log|reject");
-                    }
-                    case "reg" -> {
+                    } case "reg" -> {
                         if(server.RegClient(text))
                             server.SendMessage(ClientId, "#reg|accept");
                         else server.SendMessage(ClientId, "#reg|reject");
-                    }
-                    default -> System.err.println("Unprocessed request: " + text);
+                    } default -> System.err.println("Unprocessed request: " + text);
                 }
-            }
-            else {
+            } else {
                 System.err.println("Unprocessed request: " + message);
             }
-        }
-        else {
+        } else {
             System.err.println("Unprocessed request: " + message);
         }
     }
@@ -92,11 +86,11 @@ public class ClientObject extends Thread {
                     switch (message) {
                         case "/online" -> {
                             server.SendMessage(ClientId, server.GetOnlineClients(ClientId) );
-                        }
-                        case "/close" -> {
+                        } case "/close" -> {
                             break OUTER;
-                        }
-                        default -> HandleMessage(message);
+                        } case "#leave" -> {
+                            server.LeaveClient(ClientId);
+                        } default -> HandleMessage(message);
                     }
                 }
                 System.out.println("Клиент " + ClientId + ": " + message);
@@ -107,7 +101,7 @@ public class ClientObject extends Thread {
         }
         finally {
             System.out.println("Закрытие клиента " + ClientId + "...");
-            server.LeaveClient(ClientId);
+            server.CloseClient(ClientId);
         }
     }
 }

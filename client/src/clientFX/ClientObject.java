@@ -19,7 +19,7 @@ public class ClientObject extends Thread {
     private static PrintWriter out;
     private final LoginFormController fxml;
     private MessengerFormController MessengerForm;
-    private final Client mainThread;
+    public final Client mainThread;
 
     public ClientObject(LoginFormController fxml, Client client) {
         this.fxml = fxml;
@@ -60,13 +60,13 @@ public class ClientObject extends Thread {
             out = new PrintWriter(new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream())), true);
             fxml.SetConn(true);
+            fxml.SetClient(this);
             start();
         } catch (UnknownHostException e){
             System.out.println(e.getMessage());
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-
     }
 
     private void HandleMessage(String message) {

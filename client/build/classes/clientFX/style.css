@@ -1,0 +1,82 @@
+* {
+    -fx-font-family: Segoe UI Semibold;
+    -fx-text-fill: white;
+}
+
+.menu-bar {
+    -fx-background-color: red; /* Цвет фона панели */
+    -fx-text-fill: white; /* Цвет текста элементов меню */
+}
+
+.Button {
+    -fx-font-size: 16;    
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: none;
+    -fx-border-color: silver;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    
+    -fx-cursor: hand;
+}
+.Button:hover {
+    -fx-border-color: white;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.textField {
+    -fx-pref-width: 256;
+    -fx-pref-height: 30;
+    -fx-font-size: 14;
+    
+    -fx-background-color: none;
+    -fx-border-color: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+.text-field:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel {
+    -fx-background-color: #3ca0d0;
+}
+
+#ReconnLabel {
+    -fx-text-fill: red;
+}
+
+#BackButton {
+    -fx-background-color:  none;
+    -fx-border-color: silver;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    
+    -fx-background-image: url("icons/return.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+#BackButton:hover {
+    -fx-border-color: white;
+    -fx-background-image: url("icons/returnFocused.png");
+    -fx-background-size: 26 26;
+}
+
+#messageField {
+    -fx-pref-width: 360;
+    -fx-background-color:  none;
+}
+
+#sendButton { 
+    -fx-background-color: #3ca0d0;
+    -fx-background-image: url("icons/send.png");
+    -fx-background-size: 31 31;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-cursor: hand;
+}
+#sendButton:hover {
+    -fx-background-image: url("icons/sendFocused.png");
+    -fx-background-size: 32 32;
+}

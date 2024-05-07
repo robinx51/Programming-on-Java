@@ -7,16 +7,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="LoginForm" prefHeight="490.0" prefWidth="465.0" style="-fx-background-color: #086fa1;" styleClass="LoginForm" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientFX.LoginForm.LoginFormController">
+<AnchorPane id="LoginForm" prefHeight="490.0" prefWidth="465.0" style="-fx-background-color: #086fa1;" styleClass="LoginForm" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientFX.LoginForm.LoginFormController">
    <children>
       <AnchorPane fx:id="RegPanel" layoutY="93.0" prefHeight="358.0" prefWidth="482.0" style="-fx-background-color: #086fa1;">
          <children>
-            <TextField fx:id="NameFieldReg" layoutX="113.0" layoutY="90.0" onKeyPressed="#HandleTextBoxReg" prefHeight="30.0" prefWidth="256.0" promptText="Имя" styleClass="textField" stylesheets="@style.css">
+            <TextField fx:id="NameFieldReg" layoutX="113.0" layoutY="90.0" onKeyPressed="#HandleTextBoxReg" prefHeight="30.0" prefWidth="256.0" promptText="Имя" styleClass="textField" stylesheets="@../style.css">
                <font>
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
             </TextField>
-            <TextField fx:id="LoginFieldReg" layoutX="113.0" layoutY="140.0" onKeyPressed="#HandleTextBoxReg" prefHeight="30.0" prefWidth="256.0" promptText="Логин" styleClass="textField" stylesheets="@style.css">
+            <TextField fx:id="LoginFieldReg" layoutX="113.0" layoutY="140.0" onKeyPressed="#HandleTextBoxReg" prefHeight="30.0" prefWidth="256.0" promptText="Логин" styleClass="textField" stylesheets="@../style.css">
                <font>
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
@@ -26,31 +26,31 @@
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
             </PasswordField>
-            <Label layoutX="167.0" layoutY="35.0" style="-fx-font-weight: bold;" text="Регистрация" textFill="WHITE">
-               <font>
-                  <Font name="Segoe UI Semibold" size="24.0" />
-               </font>
-            </Label>
-            <Button id="authButton" fx:id="RegButton" layoutX="113.0" layoutY="300.0" mnemonicParsing="false" onAction="#HandleRegButton" prefHeight="43.0" prefWidth="256.0" styleClass="Button" stylesheets="@style.css" text="Зарегистрироваться" textFill="WHITE">
-               <font>
-                  <Font name="Segoe UI Semibold" size="16.0" />
-               </font>
-            </Button>
             <PasswordField fx:id="ConfirmPasswordFieldReg" layoutX="113.0" layoutY="240.0" onKeyPressed="#HandleTextBoxReg" promptText="Пароль ещё раз" styleClass="textField">
                <font>
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
             </PasswordField>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="LoginPanel" layoutY="92.0" prefHeight="358.0" prefWidth="482.0" style="-fx-background-color: #086fa1;">
-         <children>
-            <Button id="authButton" fx:id="LoginButton" layoutX="113.0" layoutY="300.0" mnemonicParsing="false" onAction="#HandleLoginButton" prefHeight="43.0" prefWidth="256.0" styleClass="Button" stylesheets="@style.css" text="Войти" textFill="WHITE">
+            <Button id="authButton" fx:id="RegButton" layoutX="113.0" layoutY="300.0" mnemonicParsing="false" onAction="#HandleRegButton" prefHeight="43.0" prefWidth="256.0" styleClass="Button" stylesheets="@../style.css" text="Зарегистрироваться" textFill="WHITE">
                <font>
                   <Font name="Segoe UI Semibold" size="16.0" />
                </font>
             </Button>
-            <TextField fx:id="LoginFieldLog" layoutX="113.0" layoutY="140.0" onKeyPressed="#HandleTextBoxLog" prefHeight="30.0" prefWidth="256.0" promptText="Логин" styleClass="textField" stylesheets="@style.css">
+            <Label layoutX="167.0" layoutY="35.0" style="-fx-font-weight: bold;" text="Регистрация" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Semibold" size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="LoginPanel" layoutY="92.0" prefHeight="358.0" prefWidth="482.0" style="-fx-background-color: #086fa1;">
+         <children>
+            <Button id="authButton" fx:id="LoginButton" layoutX="113.0" layoutY="300.0" mnemonicParsing="false" onAction="#HandleLoginButton" prefHeight="43.0" prefWidth="256.0" styleClass="Button" stylesheets="@../style.css" text="Войти" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Semibold" size="16.0" />
+               </font>
+            </Button>
+            <TextField fx:id="LoginFieldLog" layoutX="113.0" layoutY="140.0" onKeyPressed="#HandleTextBoxLog" prefHeight="30.0" prefWidth="256.0" promptText="Логин" styleClass="textField" stylesheets="@../style.css">
                <font>
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
@@ -65,19 +65,20 @@
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
             </PasswordField>
+            <Button fx:id="FastLogin" layoutX="209.0" layoutY="88.0" mnemonicParsing="false" onAction="#HandleFastLogin" style="-fx-text-fill: black;" text="robinx51" />
          </children>
       </AnchorPane>
-      <Button id="logButt" fx:id="LoginPanelButton" layoutX="34.0" layoutY="20.0" mnemonicParsing="false" onAction="#HandleLogPanelButton" prefHeight="54.0" prefWidth="186.0" styleClass="Button" stylesheets="@style.css" text="Вход" textFill="WHITE">
+      <Button id="logButt" fx:id="LoginPanelButton" layoutX="34.0" layoutY="20.0" mnemonicParsing="false" onAction="#HandleLogPanelButton" prefHeight="54.0" prefWidth="186.0" styleClass="Button" stylesheets="@../style.css" text="Вход" textFill="WHITE">
          <font>
             <Font name="Segoe UI Semibold" size="16.0" />
          </font>
       </Button>
-      <Button id="regButt" fx:id="RegPanelButton" layoutX="261.0" layoutY="21.0" mnemonicParsing="false" onAction="#HandleRegPanelButton" prefHeight="54.0" prefWidth="193.0" styleClass="Button" stylesheets="@style.css" text="Регистрация" textFill="WHITE">
+      <Button id="regButt" fx:id="RegPanelButton" layoutX="261.0" layoutY="21.0" mnemonicParsing="false" onAction="#HandleRegPanelButton" prefHeight="54.0" prefWidth="193.0" styleClass="Button" stylesheets="@../style.css" text="Регистрация" textFill="WHITE">
          <font>
             <Font name="Segoe UI Semibold" size="16.0" />
          </font>
       </Button>
-      <Label fx:id="ConnStatusLabel" alignment="CENTER" contentDisplay="TOP" layoutX="127.0" layoutY="457.0" prefHeight="18.0" prefWidth="227.0" text="Подключение к серверу не установлено" textAlignment="CENTER" textFill="RED" />
+      <Label id="ReconnLabel" fx:id="ConnStatusLabel" alignment="CENTER" contentDisplay="TOP" layoutX="127.0" layoutY="457.0" prefHeight="18.0" prefWidth="227.0" text="Подключение к серверу не установлено" textAlignment="CENTER" textFill="RED" />
       <Button fx:id="ReconnButton" layoutX="371.0" layoutY="453.0" mnemonicParsing="false" onAction="#HandleReconnButton" style="-fx-background-color: orange red;" text="Подключиться" textFill="WHITE" />
    </children>  
 </AnchorPane>
