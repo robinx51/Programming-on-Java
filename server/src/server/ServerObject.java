@@ -43,7 +43,7 @@ public class ServerObject extends Thread {
                 }
             } else 
                 System.out.println("Необработанный запрос: " + message);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -54,14 +54,14 @@ public class ServerObject extends Thread {
         if(list.size() == 1)
             return("/online|null");
         for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
-            int id = client.getKey();
+            int id = client.getValue().GetId();
             if (id != SenderId) {
-                String name = client.getValue().getName();
+                String name = client.getValue().GetName();
                 ids.add("" + id);
                 names.add(name);
             }
         }
-        String message = String.join(",", ids) + ":" + String.join(",", names);
+        String message = "/online|" + String.join(",", names) + ":" + String.join(",", ids);
         return message;
     }
     
@@ -133,7 +133,7 @@ public class ServerObject extends Thread {
                 String name = resultSet.getString(2);
                 if (id != 0) {
                     ChangeIdClient(client.GetId(), id);
-                    client.SetName(name);
+                    list.get(id).SetName(name);
                     if (list.size() > 1)
                         BroadcastMessage(id, "#new|" + name + ":" + id);
                 }

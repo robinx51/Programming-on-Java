@@ -17,12 +17,18 @@ public class ClientObject extends Thread {
     private static Socket socket;
     private static BufferedReader in;
     private static PrintWriter out;
-    private final LoginFormController fxml;
+    private final LoginFormController LoginForm;
     private MessengerFormController MessengerForm;
     public final Client mainThread;
+    
+    public class FriendClient {
+        private String name;
+        private boolean status;
+        
+    }
 
     public ClientObject(LoginFormController fxml, Client client) {
-        this.fxml = fxml;
+        this.LoginForm = fxml;
         this.mainThread = client;
     }
     public void setForm(MessengerFormController form) {
@@ -59,8 +65,8 @@ public class ClientObject extends Thread {
             // Вывод автоматически Output выталкивается PrintWriter'ом.
             out = new PrintWriter(new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream())), true);
-            fxml.SetConn(true);
-            fxml.SetClient(this);
+            LoginForm.SetConn(true);
+            LoginForm.SetClient(this);
             start();
         } catch (UnknownHostException e){
             System.out.println(e.getMessage());
@@ -78,39 +84,63 @@ public class ClientObject extends Thread {
                     options = strings[0];
                     text = strings[1];
                 }
-                if (options.startsWith("&")) {
-                    options = options.substring(1);
-                    int TargetId = Integer.parseInt(options);
-                    switch (TargetId) {
-                        case 0 -> {
-                            text = "&0|" + 0 + ':' + text;
-                            // Общий диалог
-                        }
-                        default -> {
-                            text = "&server|" + text;
-                            // Личное сообщение
+                switch (options.substring(0, 1)) {
+                    case "&" -> {
+                        options = options.substring(1);
+                        int TargetId = Integer.parseInt(options);
+                        switch (TargetId) {
+                            case 0 -> {
+                                //text = "&0|" + 0 + ':' + text;
+                                MessengerForm.NewMessage(text, TargetId);
+                            }
+                            default -> {
+                                text = "&server|" + text;
+                                // Личное сообщение
+                            }
                         }
                     }
-                } else if (options.startsWith("#")) {
-                    options = options.substring(1);
-                    if ("log".equals(options)) {
-                        if ("reject".equals(text))
-                            fxml.MessageBox("Получен ответ от сервера", "Ошибка входа", "error");
-                        else
-                            mainThread.OpenMessenger(text);
-                    } else if ("reg".equals(options)) {
-                        if ("accept".equals(text)) {
-                            fxml.MessageBox("Получен ответ от сервера", "Успешная регистрация!", "confirm");
-                            fxml.SuccessfulReg();
+                    case "#" -> {
+                        options = options.substring(1);
+                        if (null != options) switch (options) {
+                            case "log" -> {
+                                if ("reject".equals(text))
+                                    LoginForm.MessageBox("Получен ответ от сервера", "Ошибка входа", "error");
+                                else
+                                    mainThread.OpenMessenger(text);
+                            }
+                            case "reg" -> {
+                                if ("accept".equals(text)) {
+                                    LoginForm.MessageBox("Получен ответ от сервера", "Успешная регистрация!", "confirm");
+                                    LoginForm.SuccessfulReg();
+                                }
+                                else if ("reject".equals(text))
+                                    LoginForm.MessageBox("Получен ответ от сервера", "Ошибка регистрации", "error");
+                            }
+                            case "new" -> {
+                                String[] data = text.split(":");
+                                MessengerForm.NewUser(data[0], Integer.parseInt(data[1]), true);
+                            }
+                            default -> {
+                            }
                         }
-                        else if ("reject".equals(text))
-                            fxml.MessageBox("Получен ответ от сервера", "Ошибка регистрации", "error");
+                    }
+                    case "/" -> {
+                        options = options.substring(1);
+                        if ("online".equals(options)) {
+                            if (!"null".equals(text)) {
+                                String[] data = text.split(":");
+                                String[] names = data[0].split(",");
+                                String[] ids = data[1].split(",");
+                                for (int i = 0; i < names.length; i++) {
+                                    MessengerForm.NewUser(names[i],Integer.parseInt(ids[i]),true);
+                                }
+                            }
+                        }
                     }
                 }
             } else if (message.startsWith("%")) {
-                fxml.MessageBox("Сообщение от сервера", message.substring(1), "info");
-            }
-            else 
+                LoginForm.MessageBox("Сообщение от сервера", message.substring(1), "info");
+            } else 
                 System.err.println("Unprocessed request: " + message);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -134,7 +164,7 @@ public class ClientObject extends Thread {
         } catch(IOException ex) {
             System.out.println(ex.getMessage());
         } finally {
-            if (fxml.statusApp) fxml.SetConn(false);
+            if (LoginForm.statusApp) LoginForm.SetConn(false);
             try{
                 if (!socket.isClosed())
                     socket.close();

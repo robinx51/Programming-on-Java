@@ -13,8 +13,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Duration;
-import javafx.animation.FillTransition;
 
 public class LoginFormController implements Initializable {
     public boolean statusApp;

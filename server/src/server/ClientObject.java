@@ -57,8 +57,10 @@ public class ClientObject extends Thread {
                 options = options.substring(1);
                 switch (options) {
                     case "log" -> {
-                        if(server.LogClient(text, this))
+                        if(server.LogClient(text, this)) {
                             server.SendMessage(ClientId, "#log|" + ClientName);
+                            server.SendMessage(ClientId, server.GetOnlineClients(ClientId));
+                        }
                         else server.SendMessage(ClientId, "#log|reject");
                     } case "reg" -> {
                         if(server.RegClient(text))

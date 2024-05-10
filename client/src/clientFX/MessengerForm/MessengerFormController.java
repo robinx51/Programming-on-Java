@@ -4,6 +4,7 @@ import clientFX.ClientObject;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,12 +14,14 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 public class MessengerFormController implements Initializable {
     public boolean statusApp;
     private ClientObject client;
-    private int activeFriendId = 0;
-    private SortedMap<Integer, String> list;
+    private int activeFriendId = -1;
+    private SortedMap<Integer, UserProfile> FriendMap = new TreeMap<>();
     
     @FXML
     private Button BackButton; @FXML 
@@ -29,17 +32,99 @@ public class MessengerFormController implements Initializable {
     @FXML
     private AnchorPane noChatPanel; @FXML
     private AnchorPane ChatPanel; @FXML
+    private Label NameFriend; @FXML
+    private Label FriendImg; @FXML
+    private VBox MessagesList; @FXML
+    private Label TestLabel; @FXML
     private TextField MessageField; @FXML
     private Button SendButton;
     
     @FXML
-    private AnchorPane NoUsersPanel;
+    private AnchorPane NoUsersPanel;@FXML
+    private VBox FriendList;
     
+    
+    public final class UserProfile extends Pane {
+        private final String name;
+        private final int id;
+        private final boolean isOnline;
+        private int NewMessagesCount;
+        
+        private Label[] Messages;
+
+        private Button button;
+        private Label Status;
+        private Label NameLabel;
+        private Label NewMessagesLabel;
+        
+        public UserProfile(String name, int id, boolean isOnline) {
+            this.name = name;
+            this.id = id;
+            this.isOnline = isOnline;
+            NewMessagesCount = 0;
+            
+            //Messages = new LinkedList<>();
+            
+            button = new Button("");
+            Status = new Label("");
+            NameLabel = new Label(name);
+            NewMessagesLabel = new Label("" + NewMessagesCount);
+            
+            this.setId("UserProfile");
+            button.setId("UserProfile");
+            if (id == 0) Status.setId("UserProfileGroup");
+            else SetStatus(this.isOnline);
+            NameLabel.setId("UserProfileName");
+            NewMessagesLabel.setId("UserProfileCount");
+            NewMessagesLabel.setVisible(false);
+            
+            NewMessagesLabel.setLayoutX(210);
+            NewMessagesLabel.setLayoutY(3);
+            Status.setLayoutY(3);
+            
+            getChildren().addAll(Status, NameLabel, NewMessagesLabel, button);           
+            button.setOnAction((ActionEvent event) -> {
+                SetActive(name, id, Status);
+                ChatPanel.toFront();
+                NewMessagesLabel.setVisible(false);
+                NewMessagesCount = 0;
+            }); 
+        }
+        
+        public void SetStatus(boolean IsOnline) {
+            if (IsOnline) Status.setId("UserProfileOnline");
+            else Status.setId("UserProfileOffline");
+        }
+        public boolean GetStatus() { return isOnline; }
+        public int GetId() { return id; }
+        
+        public void NewMessage(String message) {
+            NewMessagesLabel.setText("" + ++NewMessagesCount);
+            NewMessagesLabel.setVisible(true);
+            //Messages.add(DerivedMessage);
+        }
+    }
+    
+    public void NewUser(String name, int id, boolean IsOnline) {
+        Platform.runLater(() -> { 
+            UserProfile Alex = new UserProfile(name, id, IsOnline);
+            FriendMap.put(id, Alex);
+            FriendList.getChildren().add(Alex);
+        });
+    }
+    public void NewMessage(String message, int id) {
+        Platform.runLater(() -> { FriendMap.get(id).NewMessage(message); });
+    }
+    
+    private void SetActive(String name, int id, Label Status) {
+        activeFriendId = id;
+        NameFriend.setText(name);
+        FriendImg.setId(Status.getId());
+    }
     public void SetClient(ClientObject client, String name) {
         this.client = client;
         HelloLabel.setText("Привет, " + name + '!');
     }
-    
     public void SetConn(boolean status) {
         Platform.runLater(() -> {
             if (status) {
@@ -53,7 +138,6 @@ public class MessengerFormController implements Initializable {
             }
         });
     }
-    
     public void MessageBox(String title, String message, String type) {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION);
@@ -76,6 +160,11 @@ public class MessengerFormController implements Initializable {
         SendButton.setTooltip(tooltip);
         tooltip = new Tooltip("Вернуться на страницу авторизации");
         BackButton.setTooltip(tooltip);
+        
+        TestLabel.setWrapText(true);
+        TestLabel.setId("MessageDerived");
+        
+        NewUser("Общий чат", 0, true);
     }
     
     @FXML
@@ -86,16 +175,31 @@ public class MessengerFormController implements Initializable {
         client.ConnectToServer();
     } @FXML
     private void HandleMessageField(KeyEvent event) {
+        if (MessageField.getText().length() >= 1) 
+            SendButton.setId("sendButtonActive");
+        else SendButton.setId("sendButton");
         if (event.getCode() == KeyCode.ENTER)
             SendButton.fire();
     } @FXML
+    private void HandleMessageTypedField(KeyEvent event) {
+        if (MessageField.getText().length() >= 1) 
+            SendButton.setId("sendButtonActive");
+        else SendButton.setId("sendButton");
+    } @FXML
+    private void HandleMessagePanel(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            noChatPanel.toFront();
+            activeFriendId = -1;
+        }
+    } @FXML
     private void HandleSendButton(ActionEvent event) { 
         //MessageBox("Нажал на кнопку","Отправишь сообщение потом","info");
-        if (MessageField.getText().length() > 1) {
+        if (MessageField.getText().length() >= 1) {
             String message = MessageField.getText();
             try {
                 client.SendMessage("@" + activeFriendId + "|" + message);
                 MessageField.setText("");
+                SendButton.setId("sendButton");
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             } 

@@ -3,10 +3,6 @@
     -fx-text-fill: white;
 }
 
-.menu-bar {
-    -fx-background-color: red; /* Цвет фона панели */
-    -fx-text-fill: white; /* Цвет текста элементов меню */
-}
 
 .Button {
     -fx-font-size: 16;    
@@ -22,28 +18,6 @@
 .Button:hover {
     -fx-border-color: white;
     -fx-background-color: rgba(255, 255, 255, 0.1);
-}
-
-.textField {
-    -fx-pref-width: 256;
-    -fx-pref-height: 30;
-    -fx-font-size: 14;
-    
-    -fx-background-color: none;
-    -fx-border-color: white;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-}
-.text-field:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-}
-
-.panel {
-    -fx-background-color: #3ca0d0;
-}
-
-#ReconnLabel {
-    -fx-text-fill: red;
 }
 
 #BackButton {
@@ -63,20 +37,169 @@
     -fx-background-size: 26 26;
 }
 
-#messageField {
-    -fx-pref-width: 360;
-    -fx-background-color:  none;
-}
-
 #sendButton { 
     -fx-background-color: #3ca0d0;
     -fx-background-image: url("icons/send.png");
     -fx-background-size: 31 31;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center center;
+    -fx-cursor: pointer;
+}
+#sendButtonActive {
+    -fx-background-color: #3ca0d0;
+    -fx-background-image: url("icons/sendActive.png");
+    -fx-background-size: 32 32;
     -fx-cursor: hand;
 }
-#sendButton:hover {
-    -fx-background-image: url("icons/sendFocused.png");
+#sendButtonActive:hover {
+    -fx-background-image: url("icons/sendHover.png");
     -fx-background-size: 32 32;
+}
+
+#CloseChatButton {
+    -fx-border-color: none;
+    
+    -fx-background-image: url("icons/return.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
+.textField {
+    -fx-pref-width: 256;
+    -fx-pref-height: 30;
+    -fx-font-size: 14;
+    
+    -fx-background-color: none;
+    -fx-border-color: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+.text-field:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+#messageField {
+    -fx-border-color: silver;
+    -fx-pref-width: 365;
+    -fx-background-color:  none;
+}
+#messageField:hover, #messageField:focused {
+    -fx-border-color: white;
+}
+
+.panel {
+    -fx-background-color: #3ca0d0;
+    -fx-background-radius: 25;
+}
+
+#ChatPanel, #FriendPanel {
+    -fx-border-color: silver;
+    -fx-border-radius: 25;
+}
+
+#MessageList {
+    -fx-border-color: silver;
+    -fx-border-radius: 5;
+    -fx-padding: 10 2 2 2;
+}
+
+
+#ReconnLabel {
+    -fx-text-fill: red;
+}
+#MessageDerived {
+    -fx-background-color:  #B7B7B7;
+    -fx-background-radius: 15;
+    -fx-label-padding:  5 10 5 10;
+    -fx-pref-width: 386;
+    -fx-pref-height: 73;
+}
+
+.List { /*Окантовка*/
+    -fx-background-color: #3ca0d0;
+}
+.List .scroll-bar:vertical { /*Фон*/
+    -fx-padding: 1 1 2 0;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+.List .scroll-bar:vertical .thumb { /*Сам скролл*/
+    -fx-background-color: silver;
+    -fx-background-radius: 2em;
+}
+.List .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: white;
+}
+.List .scroll-bar:vertical .track{ /*Окантовка скролла*/
+    -fx-border-color: silver;
+    -fx-border-radius: 2em;
+}
+.List .scroll-bar:vertical .track:hover{ /*Окантовка скролла*/
+    -fx-border-color: white;
+}
+.List .scroll-bar:vertical .increment-button , .List .scroll-bar:vertical .decrement-button {
+    -fx-background-color:transparent;
+    -fx-padding:0 10 0 0;
+}
+.List .scroll-bar .increment-arrow, .List .scroll-bar .decrement-arrow {
+    -fx-shape: " "; 
+    -fx-padding:0;
+}
+
+#UserProfile {
+    -fx-pref-width: 248;
+    -fx-pref-height: 37;
+
+    -fx-font-size: 16;    
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: silver;
+    -fx-background-color: transparent;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    
+    -fx-cursor: hand;
+}
+#UserProfile:hover {
+    -fx-border-color: white;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+#UserProfileOnline {
+    -fx-background-image: url("icons/userOnline.png");    
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 8 center;
+    
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+#UserProfileOffline {
+    -fx-background-image: url("icons/user.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 8 center;
+    
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+#UserProfileGroup {
+    -fx-background-image: url("icons/group.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 8 center;
+    
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+#UserProfileName {
+    -fx-padding: 6 0 0 40;
+}
+#UserProfileCount {
+    -fx-border-radius: 15;
+    -fx-border-color: silver;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
 }
