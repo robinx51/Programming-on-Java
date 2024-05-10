@@ -2,6 +2,7 @@ package clientFX.MessengerForm;
 
 import clientFX.ClientObject;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -25,9 +26,7 @@ public class MessengerFormController implements Initializable {
     
     @FXML
     private Button BackButton; @FXML 
-    private Label HelloLabel; @FXML
-    private Label ConnStatusLabel; @FXML
-    private Button ReconnButton;
+    private Label HelloLabel;
     
     @FXML
     private AnchorPane noChatPanel; @FXML
@@ -50,11 +49,11 @@ public class MessengerFormController implements Initializable {
         private final boolean isOnline;
         private int NewMessagesCount;
         
-        private Label[] Messages;
+        private LinkedList<Label> Messages;
 
         private Button button;
         private Label Status;
-        private Label NameLabel;
+        private final Label NameLabel;
         private Label NewMessagesLabel;
         
         public UserProfile(String name, int id, boolean isOnline) {
@@ -63,7 +62,7 @@ public class MessengerFormController implements Initializable {
             this.isOnline = isOnline;
             NewMessagesCount = 0;
             
-            //Messages = new LinkedList<>();
+            Messages = new LinkedList<>();
             
             button = new Button("");
             Status = new Label("");
@@ -84,7 +83,7 @@ public class MessengerFormController implements Initializable {
             
             getChildren().addAll(Status, NameLabel, NewMessagesLabel, button);           
             button.setOnAction((ActionEvent event) -> {
-                SetActive(name, id, Status);
+                SetActive(name, id, Status, Messages);
                 ChatPanel.toFront();
                 NewMessagesLabel.setVisible(false);
                 NewMessagesCount = 0;
@@ -102,41 +101,41 @@ public class MessengerFormController implements Initializable {
             NewMessagesLabel.setText("" + ++NewMessagesCount);
             NewMessagesLabel.setVisible(true);
             //Messages.add(DerivedMessage);
+            
+            Messages.add(new Label(name + ": " + message));
+            
         }
     }
     
     public void NewUser(String name, int id, boolean IsOnline) {
-        Platform.runLater(() -> { 
-            UserProfile Alex = new UserProfile(name, id, IsOnline);
-            FriendMap.put(id, Alex);
-            FriendList.getChildren().add(Alex);
+        Platform.runLater(() -> {
+            if (!FriendMap.containsKey(id)) {
+                UserProfile Alex = new UserProfile(name, id, IsOnline);
+                FriendMap.put(id, Alex);
+                FriendList.getChildren().add(Alex);
+            } else {
+                FriendMap.get(id).SetStatus(true);
+            }
         });
     }
+    public void LeaveUser(int id) {
+        Platform.runLater(() -> { FriendMap.get(id).SetStatus(false); });
+    }
     public void NewMessage(String message, int id) {
-        Platform.runLater(() -> { FriendMap.get(id).NewMessage(message); });
+        Platform.runLater(() -> { 
+            FriendMap.get(id).NewMessage(message); 
+        });
     }
     
-    private void SetActive(String name, int id, Label Status) {
+    private void SetActive(String name, int id, Label Status, LinkedList<Label> messages) {
         activeFriendId = id;
         NameFriend.setText(name);
         FriendImg.setId(Status.getId());
+        MessagesList.getChildren().addAll(messages);
     }
     public void SetClient(ClientObject client, String name) {
         this.client = client;
         HelloLabel.setText("Привет, " + name + '!');
-    }
-    public void SetConn(boolean status) {
-        Platform.runLater(() -> {
-            if (status) {
-                statusApp = true;
-                ConnStatusLabel.setVisible(false);
-                ReconnButton.setVisible(false);
-            } else {
-                statusApp = false;
-                ConnStatusLabel.setVisible(true);
-                ReconnButton.setVisible(true);
-            }
-        });
     }
     public void MessageBox(String title, String message, String type) {
         Platform.runLater(() -> {

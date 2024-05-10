@@ -41,36 +41,35 @@ public class ClientObject extends Thread {
                 options = strings[0];
                 text = strings[1];
             }
-            if (options.startsWith("@")) {
-                options = options.substring(1);
-                int TargetId = Integer.parseInt(options);
-                switch (TargetId) {
-                    case 0 -> {
-                        text = "&0|" + ClientId + ':' + text;
-                        server.BroadcastMessage(ClientId, text);
-                    } default -> {
-                        text = '&' + ClientId + '|' + text;
-                        server.SendMessage(TargetId, text);
+            switch (options.substring(0, 1)) {
+                case "@" -> {
+                    options = options.substring(1);
+                    int TargetId = Integer.parseInt(options);
+                    switch (TargetId) {
+                        case 0 -> {
+                            text = "&0|" + ClientId + ":" + text;
+                            server.BroadcastMessage(ClientId, text);
+                        } default -> {
+                            text = "&" + ClientId + "|" + text;
+                            server.SendMessage(TargetId, text);
+                        }
+                    }
+                } 
+                case "#" -> {
+                    options = options.substring(1);
+                    switch (options) {
+                        case "log" -> server.LogClient(text, this);
+                        case "reg" -> {
+                            if(server.RegClient(text))
+                                server.SendMessage(ClientId, "#reg|accept");
+                            else server.SendMessage(ClientId, "#reg|reject");
+                        } default -> System.err.println("Unprocessed request: " + text);
                     }
                 }
-            } else if (options.startsWith("#")) {
-                options = options.substring(1);
-                switch (options) {
-                    case "log" -> {
-                        if(server.LogClient(text, this)) {
-                            server.SendMessage(ClientId, "#log|" + ClientName);
-                            server.SendMessage(ClientId, server.GetOnlineClients(ClientId));
-                        }
-                        else server.SendMessage(ClientId, "#log|reject");
-                    } case "reg" -> {
-                        if(server.RegClient(text))
-                            server.SendMessage(ClientId, "#reg|accept");
-                        else server.SendMessage(ClientId, "#reg|reject");
-                    } default -> System.err.println("Unprocessed request: " + text);
-                }
-            } else {
-                System.err.println("Unprocessed request: " + message);
+                default -> System.err.println("Unprocessed request: " + message);
             }
+        } else if ("/online".equals(message)) {
+            server.SendMessage(ClientId, server.GetOnlineClients(ClientId));
         } else {
             System.err.println("Unprocessed request: " + message);
         }
@@ -82,6 +81,7 @@ public class ClientObject extends Thread {
             OUTER:
             while (!socket.isClosed() && !server.s.isClosed()) {
                 String message = in.readLine();
+                System.out.println("Клиент " + ClientId + ": " + message);
                 if (message == null) {
                     break;
                 } else {
@@ -89,13 +89,13 @@ public class ClientObject extends Thread {
                         case "/online" -> {
                             server.SendMessage(ClientId, server.GetOnlineClients(ClientId) );
                         } case "/close" -> {
+                            System.out.println("Клиент " + ClientId + ": " + message);
                             break OUTER;
                         } case "#leave" -> {
                             server.LeaveClient(ClientId);
                         } default -> HandleMessage(message);
                     }
                 }
-                System.out.println("Клиент " + ClientId + ": " + message);
             }
         }
         catch (IOException e) {

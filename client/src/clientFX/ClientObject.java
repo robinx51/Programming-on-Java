@@ -17,22 +17,23 @@ public class ClientObject extends Thread {
     private static Socket socket;
     private static BufferedReader in;
     private static PrintWriter out;
+    
     private final LoginFormController LoginForm;
     private MessengerFormController MessengerForm;
     public final Client mainThread;
+    private boolean IsLogined;
     
-    public class FriendClient {
-        private String name;
-        private boolean status;
-        
-    }
-
     public ClientObject(LoginFormController fxml, Client client) {
         this.LoginForm = fxml;
         this.mainThread = client;
+        IsLogined = false;
     }
-    public void setForm(MessengerFormController form) {
+    public void SetForm(MessengerFormController form) {
         MessengerForm = form;
+    }
+    public void SetAuth(boolean IsLogined) {
+        this.IsLogined = IsLogined;
+        if (!IsLogined) MessengerForm = null;
     }
     public void SendMessage(String message) {
         Platform.runLater(() -> {
@@ -44,8 +45,9 @@ public class ClientObject extends Thread {
     public void CloseClient() {
         try{
             if (socket != null && !socket.isClosed()) {
-                //out.println("/close");
+                out.println("/close");
                 socket.close();
+                MessengerForm = null;
                 this.interrupt(); 
             }
         } catch (IOException ex) {
@@ -65,8 +67,10 @@ public class ClientObject extends Thread {
             // Вывод автоматически Output выталкивается PrintWriter'ом.
             out = new PrintWriter(new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream())), true);
+            
             LoginForm.SetConn(true);
             LoginForm.SetClient(this);
+            
             start();
         } catch (UnknownHostException e){
             System.out.println(e.getMessage());
@@ -88,25 +92,25 @@ public class ClientObject extends Thread {
                     case "&" -> {
                         options = options.substring(1);
                         int TargetId = Integer.parseInt(options);
-                        switch (TargetId) {
-                            case 0 -> {
-                                //text = "&0|" + 0 + ':' + text;
-                                MessengerForm.NewMessage(text, TargetId);
-                            }
-                            default -> {
-                                text = "&server|" + text;
-                                // Личное сообщение
-                            }
-                        }
+//                        switch (TargetId) {
+//                            case 0 -> {
+//                                //text = "&0|" + 0 + ':' + text;
+//                            }
+//                            default -> {
+//                            }
+//                        }
+                        MessengerForm.NewMessage(text, TargetId);
+
                     }
                     case "#" -> {
                         options = options.substring(1);
                         if (null != options) switch (options) {
                             case "log" -> {
-                                if ("reject".equals(text))
-                                    LoginForm.MessageBox("Получен ответ от сервера", "Ошибка входа", "error");
-                                else
-                                    mainThread.OpenMessenger(text);
+                                switch (text) {
+                                    case "online" -> LoginForm.MessageBox("Получен ответ от сервера", "Пользователь с таким логином уже в сети", "warning");
+                                    case "reject" -> LoginForm.MessageBox("Получен ответ от сервера", "Ошибка входа", "error");
+                                    default -> mainThread.OpenMessenger(text);
+                                }
                             }
                             case "reg" -> {
                                 if ("accept".equals(text)) {
@@ -120,7 +124,9 @@ public class ClientObject extends Thread {
                                 String[] data = text.split(":");
                                 MessengerForm.NewUser(data[0], Integer.parseInt(data[1]), true);
                             }
+                            case "leave" -> MessengerForm.LeaveUser(Integer.parseInt(text));
                             default -> {
+                                
                             }
                         }
                     }
@@ -150,21 +156,27 @@ public class ClientObject extends Thread {
     @Override
     public void run()
     {
-        try{
-            while(!socket.isClosed())
-            {
+        try {
+            OUTER:
+            while (!socket.isClosed()) {
                 String msg = in.readLine();
-                if (msg == null)
+                if (null == msg) {
                     break;
-                else if ("/close".equals(msg)) 
-                    break;
-                else HandleMessage(msg);
+                } else {
+                    switch (msg) {
+                        case "/close" -> {
+                            break OUTER;
+                        }
+                        default -> HandleMessage(msg);
+                    }
+                }
                 System.out.println("Server: " + msg);
             }
         } catch(IOException ex) {
             System.out.println(ex.getMessage());
         } finally {
             if (LoginForm.statusApp) LoginForm.SetConn(false);
+            if (MessengerForm != null ) mainThread.ClosedServer();
             try{
                 if (!socket.isClosed())
                     socket.close();

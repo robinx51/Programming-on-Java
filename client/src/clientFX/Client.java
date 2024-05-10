@@ -32,9 +32,8 @@ public class Client extends Application {
                 AnchorPane root = loader.load();
 
                 MessengerForm = loader.getController();
-                client.setForm(MessengerForm);
+                client.SetForm(MessengerForm);
                 MessengerForm.SetClient(client, name);
-                MessengerForm.SetConn(true);
                 
                 MessengerStage.setTitle("Messenger");
                 String icon = this.getClass().getResource("icons/messenger.png").toExternalForm();
@@ -48,6 +47,8 @@ public class Client extends Application {
                 });
 
                 authStage.hide();
+                client.SetAuth(true);
+                client.SendMessage("/online");
                 MessengerStage.show();
                 LoginForm.ClearLoginPanel();
             } catch (IOException e) {
@@ -60,6 +61,16 @@ public class Client extends Application {
         Platform.runLater(() -> {
             MessengerStage.close();
             client.SendMessage("#leave");
+            client.SetAuth(false);
+            authStage.show();
+        });
+    }
+    public void ClosedServer() {
+        Platform.runLater(() -> {
+            //MessengerForm.MessageBox("Потеряно соединение с сервером", "Пожалуйста, подключитесь заново и войдите в профиль", "error");
+            MessengerStage.close();
+            
+            client.SetAuth(false);
             authStage.show();
         });
     }

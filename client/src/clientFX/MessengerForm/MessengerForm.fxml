@@ -38,7 +38,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <Label fx:id="TestLabel" alignment="TOP_LEFT" prefHeight="46.0" prefWidth="241.0" text="Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение " />
+                        <Label fx:id="TestLabel" alignment="TOP_LEFT" prefHeight="46.0" prefWidth="241.0" text="Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение " visible="false" />
                      </children>
                   </VBox>
                </content>
@@ -55,8 +55,6 @@
             </Label>
          </children>
       </AnchorPane>
-      <Label id="ReconnLabel" fx:id="ConnStatusLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="588.0" layoutY="472.0" prefHeight="18.0" prefWidth="227.0" text="Подключение к серверу не установлено" textAlignment="CENTER" textFill="RED" />
-      <Button fx:id="ReconnButton" layoutX="470.0" layoutY="469.0" mnemonicParsing="false" onAction="#HandleReconnButton" style="-fx-background-color: orange red;" text="Подключиться" textFill="WHITE" />
       <Button id="BackButton" fx:id="BackButton" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" onAction="#HandleBackButton" prefHeight="424.0" prefWidth="36.0" styleClass="Button" />
       <Label fx:id="HelloLabel" layoutX="16.0" layoutY="8.0" style="-fx-font-weight: bold;" text="Привет, " textFill="WHITE">
          <font>

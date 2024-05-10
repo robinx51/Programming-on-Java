@@ -20,35 +20,20 @@ public class LoginFormController implements Initializable {
     private Client mainThread;
 
     @FXML
-    private Button LoginButton;
-    @FXML
-    private TextField LoginFieldLog;
-    @FXML
-    private TextField PasswordFieldLog;
-    @FXML
-    private Button LoginPanelButton;
-    @FXML
-    private Button RegPanelButton;
-    @FXML
-    private TextField NameFieldReg;
-    @FXML
-    private TextField LoginFieldReg;
-    @FXML
-    private PasswordField PasswordFieldReg;
-    @FXML
-    private PasswordField ConfirmPasswordFieldReg;
-    @FXML
-    private Button RegButton;
-    @FXML
-    private AnchorPane LoginPanel;
-    @FXML
-    private AnchorPane RegPanel;
-    @FXML
-    private Label ConnStatusLabel;
-    @FXML
+    private Button LoginButton; @FXML
+    private TextField LoginFieldLog; @FXML
+    private TextField PasswordFieldLog; @FXML
+    private Button LoginPanelButton; @FXML
+    private Button RegPanelButton; @FXML
+    private TextField NameFieldReg; @FXML
+    private TextField LoginFieldReg; @FXML
+    private PasswordField PasswordFieldReg; @FXML
+    private PasswordField ConfirmPasswordFieldReg; @FXML
+    private Button RegButton; @FXML
+    private AnchorPane LoginPanel; @FXML
+    private AnchorPane RegPanel; @FXML
+    private Label ConnStatusLabel; @FXML
     private Button ReconnButton;
-    @FXML
-    public Button FastLogin;
     
     public void SetClient(ClientObject client, Client mainTh) {
         this.client = client;
@@ -170,6 +155,10 @@ public class LoginFormController implements Initializable {
     @FXML
     private void HandleFastLogin(ActionEvent event) {
         String message = "#log|robinx51 123";
+        client.SendMessage(message);
+    } @FXML
+    private void HandleMeffsLogin(ActionEvent event) {
+        String message = "#log|Meffs 123";
         client.SendMessage(message);
     }
     

@@ -7,8 +7,9 @@ import java.util.*;
         
 public class ServerObject extends Thread {
     private final SortedMap<Integer, ClientObject> list;
+    private int counter = 0;
     public ServerSocket s;
-    Connection connection;
+    private Connection ConDB;
     
     public ServerObject()
     {
@@ -54,8 +55,8 @@ public class ServerObject extends Thread {
         if(list.size() == 1)
             return("/online|null");
         for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
-            int id = client.getValue().GetId();
-            if (id != SenderId) {
+            int id = client.getKey();
+            if (id != SenderId && id > 0) {
                 String name = client.getValue().GetName();
                 ids.add("" + id);
                 names.add(name);
@@ -77,7 +78,7 @@ public class ServerObject extends Thread {
             authorization.put("password", "123");
 
             // Создание соединения с базой данных
-            connection = DriverManager.getConnection(url, authorization);
+            ConDB = DriverManager.getConnection(url, authorization);
             
             System.out.println("Соединение с базой данных установлено");
             
@@ -88,7 +89,7 @@ public class ServerObject extends Thread {
     private Boolean IsLoginExist(String login) {
         String query = "select is_login_exist(?)";
         try{
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = ConDB.prepareStatement(query);
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
             
@@ -106,7 +107,7 @@ public class ServerObject extends Thread {
         
         String query = "insert into users(name, login, password) values(?, ?, ?)";
         try{
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = ConDB.prepareStatement(query);
             statement.setString(1, data[0]);
             statement.setString(2, data[1]);
             statement.setString(3, data[2]);
@@ -123,7 +124,7 @@ public class ServerObject extends Thread {
         String query = "select * from check_login(?, ?)";
         int id = 0;
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = ConDB.prepareStatement(query);
             statement.setString(1, data[0]);
             statement.setString(2, data[1]);
             ResultSet resultSet = statement.executeQuery();
@@ -131,11 +132,19 @@ public class ServerObject extends Thread {
             if (resultSet.next()) {
                 id = resultSet.getInt(1); // Чтение значения из первого столбца результата
                 String name = resultSet.getString(2);
+                if (list.containsKey(id)) {
+                    SendMessage(client.GetId(), "#log|online");
+                    return false;
+                }
                 if (id != 0) {
                     ChangeIdClient(client.GetId(), id);
                     list.get(id).SetName(name);
+                    SendMessage(id, "#log|" + name);
                     if (list.size() > 1)
                         BroadcastMessage(id, "#new|" + name + ":" + id);
+                } else { 
+                    SendMessage(client.GetId(), "#log|reject");
+                    id = 0;
                 }
             }
         } catch (SQLException e)
@@ -158,6 +167,7 @@ public class ServerObject extends Thread {
     }
     public void CloseClient(int id) {
         ClientObject client = list.get(id);
+        list.remove(id);
         try {
             if (!client.socket.isClosed()) {
                 client.socket.close();
@@ -170,7 +180,7 @@ public class ServerObject extends Thread {
     public void LeaveClient(int id) {
         BroadcastMessage(id, "#leave|" + id);
         ClientObject client = list.get(id);
-        ChangeIdClient(client.GetId(),client.socket.getPort());
+        ChangeIdClient(client.GetId(), --counter);
     }
     public void ChangeIdClient (int oldId, int newId) {
         ClientObject client = list.get(oldId);
@@ -183,17 +193,20 @@ public class ServerObject extends Thread {
     public void SendMessage(int id, String message) {
         try {
             list.get(id).out.println(message);
+            System.out.println("@" + id + ": " + message);
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
+        
     }
     public void BroadcastMessage(int SenderId, String message) {
         try {
             for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
                 int id = client.getKey();
-                if (id != SenderId) {
+                if (id != SenderId && id > 0) {
                     ClientObject clientObj = client.getValue();
                     clientObj.out.println(message);
+                    System.out.println("@" + id + ": " + message);
                 }
             }
         } catch (Exception e) {
@@ -212,11 +225,11 @@ public class ServerObject extends Thread {
             while (!this.isInterrupted()) {
                 Socket socket = s.accept();
                 try {
-                    int port = socket.getPort();
-                    ClientObject client = new ClientObject(socket, port, this);
+                    //int port = socket.getPort();
+                    ClientObject client = new ClientObject(socket, --counter, this);
                     client.start();
-                    System.out.println("Новый клиент " + port );
-                    list.put(port, client);
+                    System.out.println("Новый клиент " + counter );
+                    list.put(counter, client);
                 }
                 catch (IOException e) {
                     System.out.println("Ошибка создания ClientObject внутри цикла в ServerObject");
