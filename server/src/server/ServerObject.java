@@ -72,12 +72,10 @@ public class ServerObject extends Thread {
             Class.forName("org.postgresql.Driver");
             String url = "jdbc:postgresql://localhost:5432/messenger";
             
-            // Создание свойств соединения с базой данных
             Properties authorization = new Properties();
             authorization.put("user", "postgres");
             authorization.put("password", "123");
 
-            // Создание соединения с базой данных
             ConDB = DriverManager.getConnection(url, authorization);
             
             System.out.println("Соединение с базой данных установлено");
@@ -164,7 +162,7 @@ public class ServerObject extends Thread {
             }
             if (s != null && !s.isClosed())
                 s.close();
-            this.interrupt(); // Прерываем поток
+            this.interrupt();
         } catch(IOException ex) {
             System.err.println("Ошибка при закрытии сокета сервера");
         }
@@ -243,7 +241,6 @@ public class ServerObject extends Thread {
                     client.start();
                     System.out.println("Новый клиент, порт: " + port );
                     offlineList.put(port, client);
-                    //onlineList.put(counter, client);
                 }
                 catch (IOException e) {
                     System.out.println("Ошибка создания ClientObject внутри цикла в ServerObject");

@@ -3,7 +3,6 @@ package clientFX.MessengerForm;
 import clientFX.ClientObject;
 import java.net.URL;
 import java.util.*;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
 
 public class MessengerFormController implements Initializable {
     public boolean statusApp;
@@ -117,6 +115,7 @@ public class MessengerFormController implements Initializable {
         public void SetStatus(boolean IsOnline) {
             if (IsOnline) status.setId("UserProfileOnline");
             else status.setId("UserProfileOffline");
+            FriendImg.setId(status.getId());
         }
         public boolean GetStatus() { return isOnline; }
         public int GetId() { return id; }

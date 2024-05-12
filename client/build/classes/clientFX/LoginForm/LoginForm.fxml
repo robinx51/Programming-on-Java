@@ -65,8 +65,8 @@
                   <Font name="Segoe UI Semibold" size="14.0" />
                </font>
             </PasswordField>
-            <Button layoutX="149.0" layoutY="88.0" mnemonicParsing="false" onAction="#HandleFastLogin" style="-fx-text-fill: black;" text="robinx51" />
-            <Button layoutX="271.0" layoutY="88.0" mnemonicParsing="false" onAction="#HandleMeffsLogin" prefHeight="26.0" prefWidth="63.0" style="-fx-text-fill: black;" text="Meffs" />
+            <Button layoutX="149.0" layoutY="88.0" mnemonicParsing="false" onAction="#HandleFastLogin" style="-fx-text-fill: black;" text="robinx51" visible="false" />
+            <Button layoutX="271.0" layoutY="88.0" mnemonicParsing="false" onAction="#HandleMeffsLogin" prefHeight="26.0" prefWidth="63.0" style="-fx-text-fill: black;" text="Meffs" visible="false" />
          </children>
       </AnchorPane>
       <Button id="logButt" fx:id="LoginPanelButton" layoutX="34.0" layoutY="20.0" mnemonicParsing="false" onAction="#HandleLogPanelButton" prefHeight="54.0" prefWidth="186.0" styleClass="Button" stylesheets="@../style.css" text="Вход" textFill="WHITE">
