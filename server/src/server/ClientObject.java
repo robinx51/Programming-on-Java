@@ -20,18 +20,10 @@ public class ClientObject extends Thread {
         ClientName = "$NONAME$";
     }
     
-    public void SetId(int id) {
-        ClientId = id;
-    }
-    public void SetName(String name) {
-        ClientName = name;
-    }
-    public String GetName(){
-        return ClientName;
-    }
-    public int GetId(){
-        return ClientId;
-    }
+    public void SetId(int id)       { ClientId = id; }
+    public void SetName(String name){ ClientName = name; }
+    public int GetId()              { return ClientId; }
+    public String GetName()         { return ClientName; }
     
     public void HandleMessage(String message) {
         if (message.contains("|")) {

@@ -7,14 +7,13 @@ import java.util.*;
         
 public class ServerObject extends Thread {
     private final SortedMap<Integer, ClientObject> onlineList;
-    //private final SortedMap<Integer, ClientObject> offlineList;
-    private int counter = 0;
+    private final SortedMap<Integer, ClientObject> offlineList;
     public ServerSocket s;
     private Connection ConDB;
     
     public ServerObject() {
         onlineList = new TreeMap<>();
-        //offlineList = new TreeMap<>();
+        offlineList = new TreeMap<>();
         ConnectToDB();
     }
     
@@ -136,10 +135,11 @@ public class ServerObject extends Thread {
                 if (onlineList.containsKey(id)) {
                     SendMessage(client.GetId(), "#log|online");
                     return false;
-                }
-                if (id != 0) {
-                    ChangeIdClient(client.GetId(), id);
-                    onlineList.get(id).SetName(name);
+                } else if (id != 0) {
+                    offlineList.remove(client.GetId());
+                    ChangeIdClient(client, id);
+                    client.SetName(name);
+                    onlineList.put(id, client);
                     SendMessage(id, "#log|" + name);
                     if (onlineList.size() > 1)
                         BroadcastMessage(id, "#new|" + name + ":" + id);
@@ -158,6 +158,9 @@ public class ServerObject extends Thread {
             for (Map.Entry<Integer, ClientObject> client : onlineList.entrySet()) {
                 ClientObject clientObj = client.getValue();
                 clientObj.socket.close();
+            } for (Map.Entry<Integer, ClientObject> client : offlineList.entrySet()) {
+                ClientObject clientObj = client.getValue();
+                clientObj.socket.close();
             }
             if (s != null && !s.isClosed())
                 s.close();
@@ -167,8 +170,14 @@ public class ServerObject extends Thread {
         }
     }
     public void CloseClient(int id) {
-        ClientObject client = onlineList.get(id);
-        onlineList.remove(id);
+        ClientObject client;
+        if (onlineList.containsKey(id)) {
+            client = onlineList.get(id);
+            onlineList.remove(id);
+        } else {
+            client = offlineList.get(id);
+            offlineList.remove(id);
+        }
         try {
             if (!client.socket.isClosed()) {
                 client.socket.close();
@@ -181,19 +190,22 @@ public class ServerObject extends Thread {
     public void LeaveClient(int id) {
         BroadcastMessage(id, "#leave|" + id);
         ClientObject client = onlineList.get(id);
-        ChangeIdClient(client.GetId(), --counter);
+        onlineList.remove(id);
+        
+        int port = client.socket.getPort();
+        ChangeIdClient(client, port);
+        offlineList.put(port, client);
     }
-    public void ChangeIdClient (int oldId, int newId) {
-        ClientObject client = onlineList.get(oldId);
-        onlineList.remove(oldId);
+    public void ChangeIdClient (ClientObject client, int newId) {
+        int oldId = client.GetId();
         client.SetId(newId);
         System.out.println("Смена id клиента " + oldId + " -> " + newId);
-        onlineList.put(newId, client);
     }
 
     public void SendMessage(int id, String message) {
         try {
-            onlineList.get(id).out.println(message);
+            if (onlineList.containsKey(id)) onlineList.get(id).out.println(message);
+            else offlineList.get(id).out.println(message);
             System.out.println("@" + id + ": " + message);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -226,12 +238,12 @@ public class ServerObject extends Thread {
             while (!this.isInterrupted()) {
                 Socket socket = s.accept();
                 try {
-                    //int port = socket.getPort();
-                    ClientObject client = new ClientObject(socket, --counter, this);
+                    int port = socket.getPort();
+                    ClientObject client = new ClientObject(socket, port, this);
                     client.start();
-                    System.out.println("Новый клиент " + counter );
-                    //offlineList.put(socket.getLocalPort(), client);
-                    onlineList.put(counter, client);
+                    System.out.println("Новый клиент, порт: " + port );
+                    offlineList.put(port, client);
+                    //onlineList.put(counter, client);
                 }
                 catch (IOException e) {
                     System.out.println("Ошибка создания ClientObject внутри цикла в ServerObject");

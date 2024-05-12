@@ -67,7 +67,7 @@ public class Client extends Application {
     }
     public void ClosedServer() {
         Platform.runLater(() -> {
-            //MessengerForm.MessageBox("Потеряно соединение с сервером", "Пожалуйста, подключитесь заново и войдите в профиль", "error");
+            MessengerForm.MessageBox("Потеряно соединение с сервером", "Пожалуйста, подключитесь заново и войдите в профиль", "error");
             MessengerStage.close();
             
             client.SetAuth(false);

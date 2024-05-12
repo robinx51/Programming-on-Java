@@ -88,7 +88,7 @@ public class MessengerFormController implements Initializable {
             newMessagesLabel = new Label("" + newMessagesCount);
             
             this.setId("UserProfile");
-            button.setId("UserProfile");
+            button.setId("UserProfileButton");
             if (id == 0) status.setId("UserProfileGroup");
             else SetStatus(this.isOnline);
             nameLabel.setId("UserProfileName");
@@ -105,9 +105,15 @@ public class MessengerFormController implements Initializable {
                 ChatPanel.toFront();
                 newMessagesLabel.setVisible(false);
                 newMessagesCount = 0;
+                button.setId("UserProfileActiveButton");
+                //button.setDisable(true);
             }); 
         }
         
+        public void SetInactive() {
+            button.setId("UserProfileButton");
+            button.setDisable(false);
+        }
         public void SetStatus(boolean IsOnline) {
             if (IsOnline) status.setId("UserProfileOnline");
             else status.setId("UserProfileOffline");
@@ -148,19 +154,18 @@ public class MessengerFormController implements Initializable {
     public void NewMessage(String message, int id, boolean isDerived) {
         Platform.runLater(() -> { 
             Node Message = FriendMap.get(id).NewMessage(message, isDerived);
-            if (activeFriendId == id) {
-                MessagesList.getChildren().add(Message);
-//                PauseTransition pause = new PauseTransition(Duration.millis(50));
-//                pause.setOnFinished(e -> MessagesScrollPane.setVvalue(1.0));
-//                pause.play();
-            }
+            if (activeFriendId == id) MessagesList.getChildren().add(Message);
         });
     }
     private void SetActive(String name, int id, Label Status, ObservableList<Node> messages) {
+        if (activeFriendId != -1) SetInactive(activeFriendId);
         activeFriendId = id;
         NameFriend.setText(name);
         FriendImg.setId(Status.getId());
         MessagesList.getChildren().setAll(messages);
+    }
+    private void SetInactive(int id) {
+        FriendMap.get(id).SetInactive();
     }
     
     public void SetClient(ClientObject client, String name) {
@@ -220,6 +225,7 @@ public class MessengerFormController implements Initializable {
         if (event.getCode() == KeyCode.ESCAPE) {
             noChatPanel.toFront();
             MessagesList.getChildren().clear();
+            SetInactive(activeFriendId);
             activeFriendId = -1;
         }
     } @FXML

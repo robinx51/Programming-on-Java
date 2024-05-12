@@ -171,6 +171,17 @@
     -fx-font-size: 16;    
     -fx-text-fill: white;
     -fx-font-weight: bold;
+    
+    -fx-background-color: transparent;
+}
+#UserProfileButton {
+    -fx-pref-width: 248;
+    -fx-pref-height: 37;
+
+    -fx-font-size: 16;    
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    
     -fx-border-color: silver;
     -fx-background-color: transparent;
     -fx-border-radius: 15;
@@ -178,7 +189,18 @@
     
     -fx-cursor: hand;
 }
-#UserProfile:hover {
+#UserProfileActiveButton {
+    -fx-pref-width: 248;
+    -fx-pref-height: 37;
+
+    -fx-border-color: white;
+    -fx-background-color: transparent;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    
+    -fx-cursor: pointer;
+}
+#UserProfileButton:hover {
     -fx-border-color: white;
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
