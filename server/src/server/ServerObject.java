@@ -6,14 +6,15 @@ import java.sql.*;
 import java.util.*;
         
 public class ServerObject extends Thread {
-    private final SortedMap<Integer, ClientObject> list;
+    private final SortedMap<Integer, ClientObject> onlineList;
+    //private final SortedMap<Integer, ClientObject> offlineList;
     private int counter = 0;
     public ServerSocket s;
     private Connection ConDB;
     
-    public ServerObject()
-    {
-        list = new TreeMap<>();
+    public ServerObject() {
+        onlineList = new TreeMap<>();
+        //offlineList = new TreeMap<>();
         ConnectToDB();
     }
     
@@ -50,11 +51,11 @@ public class ServerObject extends Thread {
     }
     
     public String GetOnlineClients(int SenderId){
+        if(onlineList.size() < 2)
+            return("/online|null");
         List<String> ids = new ArrayList<>();
         List<String> names = new ArrayList<>();
-        if(list.size() == 1)
-            return("/online|null");
-        for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
+        for (Map.Entry<Integer, ClientObject> client : onlineList.entrySet()) {
             int id = client.getKey();
             if (id != SenderId && id > 0) {
                 String name = client.getValue().GetName();
@@ -132,15 +133,15 @@ public class ServerObject extends Thread {
             if (resultSet.next()) {
                 id = resultSet.getInt(1); // Чтение значения из первого столбца результата
                 String name = resultSet.getString(2);
-                if (list.containsKey(id)) {
+                if (onlineList.containsKey(id)) {
                     SendMessage(client.GetId(), "#log|online");
                     return false;
                 }
                 if (id != 0) {
                     ChangeIdClient(client.GetId(), id);
-                    list.get(id).SetName(name);
+                    onlineList.get(id).SetName(name);
                     SendMessage(id, "#log|" + name);
-                    if (list.size() > 1)
+                    if (onlineList.size() > 1)
                         BroadcastMessage(id, "#new|" + name + ":" + id);
                 } else { 
                     SendMessage(client.GetId(), "#log|reject");
@@ -154,7 +155,7 @@ public class ServerObject extends Thread {
     
     public void StopServer() {
         try {
-            for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
+            for (Map.Entry<Integer, ClientObject> client : onlineList.entrySet()) {
                 ClientObject clientObj = client.getValue();
                 clientObj.socket.close();
             }
@@ -166,8 +167,8 @@ public class ServerObject extends Thread {
         }
     }
     public void CloseClient(int id) {
-        ClientObject client = list.get(id);
-        list.remove(id);
+        ClientObject client = onlineList.get(id);
+        onlineList.remove(id);
         try {
             if (!client.socket.isClosed()) {
                 client.socket.close();
@@ -179,20 +180,20 @@ public class ServerObject extends Thread {
     }
     public void LeaveClient(int id) {
         BroadcastMessage(id, "#leave|" + id);
-        ClientObject client = list.get(id);
+        ClientObject client = onlineList.get(id);
         ChangeIdClient(client.GetId(), --counter);
     }
     public void ChangeIdClient (int oldId, int newId) {
-        ClientObject client = list.get(oldId);
-        list.remove(oldId);
+        ClientObject client = onlineList.get(oldId);
+        onlineList.remove(oldId);
         client.SetId(newId);
         System.out.println("Смена id клиента " + oldId + " -> " + newId);
-        list.put(newId, client);
+        onlineList.put(newId, client);
     }
 
     public void SendMessage(int id, String message) {
         try {
-            list.get(id).out.println(message);
+            onlineList.get(id).out.println(message);
             System.out.println("@" + id + ": " + message);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -201,7 +202,7 @@ public class ServerObject extends Thread {
     }
     public void BroadcastMessage(int SenderId, String message) {
         try {
-            for (Map.Entry<Integer, ClientObject> client : list.entrySet()) {
+            for (Map.Entry<Integer, ClientObject> client : onlineList.entrySet()) {
                 int id = client.getKey();
                 if (id != SenderId && id > 0) {
                     ClientObject clientObj = client.getValue();
@@ -229,7 +230,8 @@ public class ServerObject extends Thread {
                     ClientObject client = new ClientObject(socket, --counter, this);
                     client.start();
                     System.out.println("Новый клиент " + counter );
-                    list.put(counter, client);
+                    //offlineList.put(socket.getLocalPort(), client);
+                    onlineList.put(counter, client);
                 }
                 catch (IOException e) {
                     System.out.println("Ошибка создания ClientObject внутри цикла в ServerObject");

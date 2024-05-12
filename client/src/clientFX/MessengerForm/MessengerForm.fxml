@@ -11,35 +11,23 @@
 
 <AnchorPane id="MessengerForm" prefHeight="500.0" prefWidth="850.0" style="-fx-background-color: #086fa1;" styleClass="MessengerForm" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientFX.MessengerForm.MessengerFormController">
    <children>
-      <AnchorPane fx:id="noChatPanel" layoutX="70.0" layoutY="39.0" prefHeight="424.0" prefWidth="450.0" styleClass="panel">
-         <children>
-            <Label layoutX="123.0" layoutY="202.0" text="Выберите чат из списка справа" textFill="WHITE">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-         </children>
-      </AnchorPane>
       <AnchorPane id="ChatPanel" fx:id="ChatPanel" layoutX="70.0" layoutY="39.0" onKeyPressed="#HandleMessagePanel" prefHeight="424.0" prefWidth="450.0" styleClass="panel">
          <children>
             <TextField id="messageField" fx:id="MessageField" layoutX="20.0" layoutY="377.0" onKeyPressed="#HandleMessageField" onKeyTyped="#HandleMessageTypedField" prefHeight="31.0" prefWidth="373.0" promptText="Напишите сообщение..." styleClass="textField" />
             <Button id="sendButton" fx:id="SendButton" alignment="CENTER" contentDisplay="CENTER" layoutX="400.0" layoutY="377.0" mnemonicParsing="false" onAction="#HandleSendButton" prefHeight="32.0" prefWidth="32.0" stylesheets="@../style.css">
                </Button>
-            <ScrollPane id="MessageList" fitToHeight="true" hbarPolicy="NEVER" layoutX="20.0" layoutY="45.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="326.0" prefViewportHeight="424.0" prefViewportWidth="280.0" prefWidth="411.0" styleClass="List">
+            <ScrollPane id="MessageList" fx:id="MessagesScrollPane" fitToHeight="true" hbarPolicy="NEVER" layoutX="20.0" layoutY="45.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="326.0" prefWidth="411.0" styleClass="List">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
                <content>
-                  <VBox fx:id="MessagesList" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#HandleMessagePanel" prefHeight="312.0" prefWidth="406.0" spacing="10.0" styleClass="List">
+                  <VBox fx:id="MessagesList" alignment="BOTTOM_CENTER" fillWidth="false" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#HandleMessagePanel" prefHeight="312.0" prefWidth="406.0" spacing="10.0" styleClass="List">
                      <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                        <Insets bottom="10.0" left="10.0" right="15.0" />
                      </padding>
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
-                     <children>
-                        <Label fx:id="TestLabel" alignment="TOP_LEFT" prefHeight="46.0" prefWidth="241.0" text="Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение Сообщение " visible="false" />
-                     </children>
                   </VBox>
                </content>
             </ScrollPane>
@@ -49,6 +37,15 @@
                </font>
             </Label>
             <Label fx:id="NameFriend" layoutX="69.0" layoutY="14.0" style="-fx-font-weight: bold;" text="Имя собеседника">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="NoChatPanel" fx:id="noChatPanel" layoutX="70.0" layoutY="39.0" prefHeight="424.0" prefWidth="450.0" styleClass="panel">
+         <children>
+            <Label layoutX="123.0" layoutY="202.0" text="Выберите чат из списка справа" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>

@@ -44,10 +44,11 @@ public class ClientObject extends Thread {
             switch (options.substring(0, 1)) {
                 case "@" -> {
                     options = options.substring(1);
+                    //if (options.contains(",")) {} // Нереализованные беседы
                     int TargetId = Integer.parseInt(options);
                     switch (TargetId) {
                         case 0 -> {
-                            text = "&0|" + ClientId + ":" + text;
+                            text = "@0:" + ClientId + "|" + text;
                             server.BroadcastMessage(ClientId, text);
                         } default -> {
                             text = "&" + ClientId + "|" + text;
@@ -89,7 +90,6 @@ public class ClientObject extends Thread {
                         case "/online" -> {
                             server.SendMessage(ClientId, server.GetOnlineClients(ClientId) );
                         } case "/close" -> {
-                            System.out.println("Клиент " + ClientId + ": " + message);
                             break OUTER;
                         } case "#leave" -> {
                             server.LeaveClient(ClientId);

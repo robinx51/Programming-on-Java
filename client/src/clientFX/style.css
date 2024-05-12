@@ -93,7 +93,7 @@
     -fx-background-radius: 25;
 }
 
-#ChatPanel, #FriendPanel {
+#NoChatPanel, #ChatPanel, #FriendPanel {
     -fx-border-color: silver;
     -fx-border-radius: 25;
 }
@@ -108,13 +108,30 @@
 #ReconnLabel {
     -fx-text-fill: red;
 }
-#MessageDerived {
-    -fx-background-color:  #B7B7B7;
-    -fx-background-radius: 15;
-    -fx-label-padding:  5 10 5 10;
-    -fx-pref-width: 386;
-    -fx-pref-height: 73;
+
+#MessagePane {
+    -fx-pref-width: 381px;
+    -fx-min-height: 32px;
 }
+#DerivedMessage {
+    -fx-background-radius: 15;
+    -fx-border-color: white;
+    -fx-border-radius: 15 15 15 5; /* Верхний левый, верхний правый, нижний правый, нижний левый */
+    -fx-label-padding:  5 10 5 11;
+    -fx-min-width: 32px;
+    -fx-max-width: 381px;
+    -fx-pref-height: 32px;
+}
+#SendedMessage {
+    -fx-background-radius: 15;
+    -fx-border-color: silver;
+    -fx-border-radius: 15 15 5 15; /* Верхний левый, верхний правый, нижний правый, нижний левый */
+    -fx-label-padding:  5 10 5 11;
+    -fx-min-width: 32px;
+    -fx-max-width: 381px;
+    -fx-pref-height: 32px;
+}
+
 
 .List { /*Окантовка*/
     -fx-background-color: #3ca0d0;

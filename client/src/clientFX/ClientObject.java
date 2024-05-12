@@ -92,15 +92,18 @@ public class ClientObject extends Thread {
                     case "&" -> {
                         options = options.substring(1);
                         int TargetId = Integer.parseInt(options);
-//                        switch (TargetId) {
-//                            case 0 -> {
-//                                //text = "&0|" + 0 + ':' + text;
-//                            }
-//                            default -> {
-//                            }
-//                        }
-                        MessengerForm.NewMessage(text, TargetId);
-
+                        MessengerForm.NewMessage(text, TargetId, true);
+                    }
+                    case "@" -> { // P: "@to:from|message"
+                        options = options.substring(1);
+                        int TargetId, FromId;
+                        {
+                            String[] data = options.split(":");
+                            TargetId = Integer.parseInt(data[0]);
+                            FromId = Integer.parseInt(data[1]); 
+                        }
+                        text = MessengerForm.GetName(FromId) + ": " + text;
+                        MessengerForm.NewMessage(text, TargetId, true);
                     }
                     case "#" -> {
                         options = options.substring(1);
