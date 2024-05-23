@@ -21,18 +21,15 @@ public class ClientObject extends Thread {
     private final LoginFormController LoginForm;
     private MessengerFormController MessengerForm;
     public final Client mainThread;
-    private boolean IsLogined;
     
     public ClientObject(LoginFormController fxml, Client client) {
         this.LoginForm = fxml;
         this.mainThread = client;
-        IsLogined = false;
     }
     public void SetForm(MessengerFormController form) {
         MessengerForm = form;
     }
     public void SetAuth(boolean IsLogined) {
-        this.IsLogined = IsLogined;
         if (!IsLogined) MessengerForm = null;
     }
     public void SendMessage(String message) {

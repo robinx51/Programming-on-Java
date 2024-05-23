@@ -12,9 +12,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class Client extends Application {
-    LoginFormController LoginForm;
-    MessengerFormController MessengerForm;
-    ClientObject client;
+    private LoginFormController LoginForm;
+    private MessengerFormController MessengerForm;
+    private ClientObject client;
     private Stage authStage;
     private Stage MessengerStage;
     

@@ -72,7 +72,7 @@ public class ClientObject extends Thread {
     public void run() {
         try {
             OUTER:
-            while (!socket.isClosed() && !server.s.isClosed()) {
+            while (!socket.isClosed() && !server.serverSocket.isClosed()) {
                 String message = in.readLine();
                 System.out.println("Клиент " + ClientId + ": " + message);
                 if (message == null) {

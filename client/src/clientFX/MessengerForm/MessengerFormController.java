@@ -17,7 +17,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 
 public class MessengerFormController implements Initializable {
-    public boolean statusApp;
+    public Boolean statusApp;
     private ClientObject client;
     private int activeFriendId = -1;
     private final SortedMap<Integer, UserProfile> FriendMap = new TreeMap<>();
@@ -53,7 +53,7 @@ public class MessengerFormController implements Initializable {
         private Label newMessagesLabel;
         
         private final class Message extends Pane {
-            Label messageLabel;
+            private final Label messageLabel;
 
             public Message(String message, boolean isDerived) {
                 this.setId("MessagePane");

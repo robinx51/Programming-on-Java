@@ -15,7 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class LoginFormController implements Initializable {
-    public boolean statusApp;
+    public Boolean statusApp;
     private ClientObject client;
     private Client mainThread;
 
@@ -42,7 +42,7 @@ public class LoginFormController implements Initializable {
     public void SetClient(ClientObject client) {
         this.client = client;
     }
-    public void SetConn(boolean status) {
+    public void SetConn(Boolean status) {
         Platform.runLater(() -> {
             if (status) {
                 statusApp = true;

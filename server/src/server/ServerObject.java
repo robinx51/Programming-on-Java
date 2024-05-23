@@ -8,7 +8,7 @@ import java.util.*;
 public class ServerObject extends Thread {
     private final SortedMap<Integer, ClientObject> onlineList;
     private final SortedMap<Integer, ClientObject> offlineList;
-    public ServerSocket s;
+    public ServerSocket serverSocket;
     private Connection ConDB;
     
     public ServerObject() {
@@ -98,7 +98,7 @@ public class ServerObject extends Thread {
         {   System.err.println("Error accessing database!"); }
         return false;
     }
-    public boolean RegClient(String message) {
+    public Boolean RegClient(String message) {
         String[] data = message.split(" "); // "name login password"
         if (IsLoginExist(data[1]))
             return false;
@@ -117,7 +117,7 @@ public class ServerObject extends Thread {
         {   System.err.println("Error accessing database!"); }
         return false;
     }
-    public boolean LogClient(String message, ClientObject client) {
+    public Boolean LogClient(String message, ClientObject client) {
         String[] data = message.split(" "); // "login password"
         String query = "select * from check_login(?, ?)";
         int id = 0;
@@ -160,8 +160,8 @@ public class ServerObject extends Thread {
                 ClientObject clientObj = client.getValue();
                 clientObj.socket.close();
             }
-            if (s != null && !s.isClosed())
-                s.close();
+            if (serverSocket != null && !serverSocket.isClosed())
+                serverSocket.close();
             this.interrupt();
         } catch(IOException ex) {
             System.err.println("Ошибка при закрытии сокета сервера");
@@ -228,13 +228,13 @@ public class ServerObject extends Thread {
     @Override
     public void run()
     {
-        s = null;
+        serverSocket = null;
         try {
-            s = new ServerSocket(8080);
+            serverSocket = new ServerSocket(8080);
             System.out.println("Сервер запущен");
             
             while (!this.isInterrupted()) {
-                Socket socket = s.accept();
+                Socket socket = serverSocket.accept();
                 try {
                     int port = socket.getPort();
                     ClientObject client = new ClientObject(socket, port, this);

@@ -18,7 +18,7 @@ public class Server {
         Scanner console = new Scanner(System.in);
         
         OUTER:
-        while (!server.s.isClosed()) {
+        while (!server.serverSocket.isClosed()) {
             String str = console.nextLine();
             switch (str) {
                 case "stop", "стоп" -> {
